@@ -1,0 +1,61 @@
+{
+  "companyId": "E5",
+  "companyName": "Empresa 5",
+  "file": "e5_presupuesto.xlsx",
+  "currency": "MXN",
+  "scale": 1000,
+  "expenseSign": "negative",
+  "sheets": [
+    {
+      "sheet": "Presupuesto",
+      "headerRow": 1,
+      "shape": "long",
+      "columns": {
+        "account": "Cuenta",
+        "description": "Nombre",
+        "period": "Periodo",
+        "amount": "Importe (miles MXN)",
+        "counterparty": "Contraparte"
+      }
+    }
+  ],
+  "counterpartyMap": {
+    "Empresa 2": "E2"
+  },
+  "fileRates": {
+    "sheet": "Tasas",
+    "headerRow": 1,
+    "period": "Mes",
+    "rate": "GTQ por MXN",
+    "currency": "MXN"
+  },
+  "accountMap": {
+    "401-01": "4000",
+    "401-90": "4100",
+    "501-01": "5000",
+    "501-90": "5100",
+    "601-01": "6100",
+    "602-01": "6200",
+    "603-01": "6300",
+    "604-01": "6400",
+    "605-01": "6500",
+    "605-02": "6500",
+    "609-01": "6900",
+    "701-01": "7100",
+    "801-01": "8100",
+    "101-01": "1100",
+    "105-01": "1200",
+    "105-90": "1250",
+    "115-01": "1300",
+    "120-01": "1500",
+    "201-01": "2100",
+    "201-90": "2150",
+    "213-01": "2200",
+    "215-01": "2300",
+    "251-01": "2500",
+    "301-01": "3100",
+    "304-01": "3200",
+    "305-01": "3300"
+  },
+  "status": "proposed"
+}

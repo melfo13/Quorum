@@ -14,7 +14,7 @@ All six files describe the same presupuesto shape. Only `companyId`, `companyNam
 | `expenseSign` | `negative` means an expense is already stored as a negative `Monto`. The amount is kept as written. |
 | `sheets` | Which sheet to read, that the header is row 1, that the shape is one row per account and month, and which header is which column. |
 | `accountMap` | Local `Cuenta` → group account in `config/catalog.json`. Two local sales accounts can share one group account. |
-| `counterpartyMap` | The name in `Contraparte` → another company id. It is empty, so a related-party name stays a label and is not eliminated against another book. |
+| `counterpartyMap` | The name in `Contraparte` → another company id. It lists every group company by name and by code, so a row whose counterparty names a group company is eliminated against that company's book. Any other name (for example the old "Empresa 3") is not a group company: the row stays out of the number as `IC_OUTSIDE` until the file is fixed. |
 | `status` | `proposed` until someone approves it on the mapping screen. Approval is stored for that visitor, not in this file. |
 
 `sheets[0].columns` names the headers:

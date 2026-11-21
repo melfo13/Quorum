@@ -58,46 +58,46 @@ export function FindingRow({ f, excerpts, action }: { f: FindingRowView; excerpt
     </button>
   );
 
-  const cell = 'max-lg:p-0 lg:border-b lg:border-rule lg:px-3 lg:py-2.5 lg:align-top';
+  const cell = '@max-4xl/main:p-0 @4xl/main:border-b @4xl/main:border-rule @4xl/main:px-3 @4xl/main:py-2.5 @4xl/main:align-top';
   return (
     <>
       <tr
         ref={flashRef}
         id={f.id}
         className={cx(
-          'scroll-mt-6 target:bg-raised max-lg:grid max-lg:grid-cols-[minmax(0,1fr)_auto] max-lg:gap-x-4 max-lg:gap-y-1 max-lg:border-b max-lg:border-rule max-lg:py-3.5',
-          open && 'lg:[&>td]:border-b-0 lg:[&>th]:border-b-0',
+          'scroll-mt-6 target:bg-raised @max-4xl/main:grid @max-4xl/main:grid-cols-[minmax(0,1fr)_auto] @max-4xl/main:gap-x-4 @max-4xl/main:gap-y-1 @max-4xl/main:border-b @max-4xl/main:border-rule @max-4xl/main:py-3.5',
+          open && '@4xl/main:[&>td]:border-b-0 @4xl/main:[&>th]:border-b-0',
         )}
       >
-        <th scope="row" className={cx(cell, 'text-left font-medium max-lg:col-start-1')}>
+        <th scope="row" className={cx(cell, 'text-left font-medium @max-4xl/main:col-start-1')}>
           <div className="flex flex-col items-start gap-1">
             <span>{f.rule}</span>
             {!f.toggleLabel && excerpts.length > 0 && toggle('', 'text')}
           </div>
         </th>
-        <td className={cx(cell, 'max-lg:col-start-2 max-lg:row-start-1 max-lg:text-right')}>
+        <td className={cx(cell, '@max-4xl/main:col-start-2 @max-4xl/main:row-start-1 @max-4xl/main:text-right')}>
           <Pill tone={f.status.tone}>{f.status.text}</Pill>
         </td>
-        <td className={cx(cell, 'font-mono text-[13px] text-muted max-lg:col-span-2 lg:text-ink')}>
+        <td className={cx(cell, 'font-mono text-[13px] text-muted @max-4xl/main:col-span-2 @4xl/main:text-ink')}>
           {f.where.split(' y ').map((w) => (
-            <div key={w} className="lg:whitespace-nowrap">
+            <div key={w} className="@4xl/main:whitespace-nowrap">
               {w}
             </div>
           ))}
         </td>
-        <td className={cx(cell, 'max-lg:col-span-2')}>
+        <td className={cx(cell, '@max-4xl/main:col-span-2')}>
           <div>{f.found}</div>
           <div className="text-muted">Esperado: {f.expected}</div>
         </td>
-        <td className={cx(cell, 'max-lg:col-start-1 lg:min-w-[150px] lg:text-right')}>
+        <td className={cx(cell, '@max-4xl/main:col-start-1 @4xl/main:min-w-[150px] @4xl/main:text-right')}>
           <div className="whitespace-nowrap font-semibold tabular-nums">{f.figure}</div>
           <div className="text-muted">{f.words}</div>
         </td>
         <td
           className={cx(
             cell,
-            'lg:text-right',
-            f.wideAction ? 'max-lg:col-span-2 max-lg:flex max-lg:justify-end' : 'max-lg:col-start-2 max-lg:self-end',
+            '@4xl/main:text-right',
+            f.wideAction ? '@max-4xl/main:col-span-2 @max-4xl/main:flex @max-4xl/main:justify-end' : '@max-4xl/main:col-start-2 @max-4xl/main:self-end',
           )}
         >
           {f.resolved ? (
@@ -109,8 +109,8 @@ export function FindingRow({ f, excerpts, action }: { f: FindingRowView; excerpt
           )}
         </td>
       </tr>
-      <tr id={panelId} hidden={!open} className="max-lg:block">
-        <td colSpan={6} className="border-b border-rule px-3 pb-4 pt-1 max-lg:block max-lg:px-0">
+      <tr id={panelId} hidden={!open} className="@max-4xl/main:block">
+        <td colSpan={6} className="border-b border-rule px-3 pb-4 pt-1 @max-4xl/main:block @max-4xl/main:px-0">
           <div className="flex flex-col gap-3">
             {excerpts.map((e) => (
               <SourceExcerpt key={`${e.file}!${e.sheet}!${e.rows.find((r) => r.isTarget)?.row}`} excerpt={e} />

@@ -151,7 +151,7 @@ export default async function MappingPage({ params }: { params: Promise<{ compan
         crumb={
           <>
             <Link href="/load" className="text-muted hover:text-ink">
-              Carga
+              Configuración
             </Link>{' '}
             / {company.name}
           </>
@@ -194,7 +194,7 @@ export default async function MappingPage({ params }: { params: Promise<{ compan
         />
       </Strip>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+      <div className="grid gap-6 @4xl/main:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
         <div className="flex min-w-0 flex-col gap-6">
           <Panel
             title="Columnas del archivo"
@@ -238,7 +238,7 @@ export default async function MappingPage({ params }: { params: Promise<{ compan
               </table>
             </div>
             <p className="m-0 text-xs text-muted">
-              Leído según <Ref>mappings/{id.toLowerCase()}.json</Ref>. Para cambiar la lectura, cambia ese archivo.
+              Leído según <Ref>mappings/{id}.json</Ref>. Para cambiar la lectura, cambia ese archivo.
             </p>
           </Panel>
 
@@ -314,7 +314,7 @@ export default async function MappingPage({ params }: { params: Promise<{ compan
                 />
               </>
             ) : (
-              <p className="m-0 rounded-[8px] border border-dashed border-control px-3 py-2.5 text-muted">
+              <p className="m-0 rounded-[16px] border border-dashed border-control px-3 py-2.5 text-muted">
                 No se leyó ninguna celda de ventas de este archivo.
               </p>
             )}
@@ -323,14 +323,14 @@ export default async function MappingPage({ params }: { params: Promise<{ compan
 
         {/* On desktop the right column takes the left column's height; the account list scrolls inside its card. */}
         <div className="relative min-w-0">
-          <div className="flex min-h-0 flex-col gap-6 lg:absolute lg:inset-0">
+          <div className="flex min-h-0 flex-col gap-6 @4xl/main:absolute @4xl/main:inset-0">
             <Panel
               title="Cuentas"
               aside={`${withDestination} de ${accounts.length} con destino`}
-              className="min-h-0 lg:flex-1"
+              className="min-h-0 @4xl/main:flex-1"
             >
               <div
-                className="max-h-[420px] min-h-0 overflow-y-auto lg:max-h-none lg:flex-1"
+                className="max-h-[420px] min-h-0 overflow-y-auto @4xl/main:max-h-none @4xl/main:flex-1"
                 tabIndex={0}
                 aria-label={`Las ${accounts.length} cuentas`}
               >
@@ -357,7 +357,7 @@ export default async function MappingPage({ params }: { params: Promise<{ compan
                   : 'Este archivo no trae subtotales ni columna de total; los ingresos se verifican solo fila por fila.'}
               </p>
               {control.firstMismatch && (
-                <div className="flex flex-col gap-1 rounded-[6px] bg-neg-bg px-3 py-2.5 text-neg-ink">
+                <div className="flex flex-col gap-1 rounded-[10px] bg-neg-bg px-3 py-2.5 text-neg-ink">
                   <Ref>
                     {mapping.file} · fila {control.firstMismatch.row}
                   </Ref>

@@ -4,7 +4,7 @@ import type { Kpi } from '@/lib/engine/types';
 import type { Excerpt } from '@/lib/server/excerpt';
 import { int, local, millions, money, monthName, pct, rate } from '@/lib/format';
 import { SourceExcerpt } from '@/components/ui/SourceExcerpt';
-import { ButtonLink, Ref, cx } from '@/components/ui/primitives';
+import { ButtonLink, MetricValue, Ref, cx } from '@/components/ui/primitives';
 import type { LineAudit } from './audit';
 import { Trail, type TrailStep } from './Trail';
 
@@ -51,12 +51,12 @@ function Shell({ caption, figure, children }: { caption: string; figure: string;
   return (
     <aside
       aria-label="Origen de la cifra"
-      className="box-border flex min-w-0 flex-col gap-5 rounded-[8px] border border-border bg-surface p-5 lg:sticky lg:top-6"
+      className="box-border flex min-w-0 flex-col gap-5 card p-5 lg:sticky lg:top-6"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 flex-col gap-0.5">
           <h2 className="m-0 text-sm font-normal text-muted">{caption}</h2>
-          <div className="text-[26px] font-semibold leading-tight">{figure}</div>
+          <div className="text-[30px] font-semibold leading-tight">{typeof figure === 'string' ? <MetricValue text={figure} /> : figure}</div>
         </div>
         <ButtonLink href="/consolidated?line=none" scroll={false} size="sm" aria-label="Cerrar origen de la cifra">
           Cerrar
@@ -147,7 +147,7 @@ export function LinePanel({ a, highlight, excerpt }: { a: LineAudit; highlight: 
             </table>
           </div>
         ) : (
-          <p className="m-0 rounded-[6px] border border-dashed border-control px-3 py-2 text-muted">
+          <p className="m-0 rounded-[10px] border border-dashed border-control px-3 py-2 text-muted">
             Ninguna empresa aporta a esta línea.
           </p>
         )}

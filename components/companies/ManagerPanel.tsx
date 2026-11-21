@@ -1,27 +1,15 @@
 /**
- * "¿Qué tiene que corregir Empresa X?": the company's open findings as tasks for its manager, the
- * quality of its delivery, and what it brings to the group number.
+ * "¿Cómo le va a Empresa X?": what the company brings to the group first (revenue, EBIT, ROIC against
+ * the WACC, EVA), in one sentence and four figures. How clean its file arrived is a quiet footnote;
+ * the open fixes, if any, stay folded under it for whoever has to chase them.
  */
 import Link from 'next/link';
-import { Pill, buttonClass, cx } from '@/components/ui/primitives';
+import { MetricValue, Pill, cx } from '@/components/ui/primitives';
 import { int, money, pct } from '@/lib/format';
 import type { CompanyValue, GroupValue } from './model';
-import { taskOf } from './model';
+import { tasksOf } from './model';
 
-const SEVERITY: Record<string, { tone: 'negative' | 'neutral' | 'warning'; text: string }> = {
-  block: { tone: 'negative', text: 'Bloqueo' },
-  quarantine: { tone: 'negative', text: 'Cuarentena' },
-  warning: { tone: 'neutral', text: 'Aviso' },
-};
-
-function Line({ label, children, strong }: { label: string; children: React.ReactNode; strong?: boolean }) {
-  return (
-    <div className="flex items-baseline justify-between gap-4 border-b border-rule py-2 last:border-b-0">
-      <span className="text-muted">{label}</span>
-      <span className={cx('text-right tabular-nums', strong && 'font-semibold')}>{children}</span>
-    </div>
-  );
-}
+const SEVERITY: Record<string, string> = { block: 'Bloqueo', quarantine: 'Cuarentena', warning: 'Aviso' };
 
 export function Switcher({ g, selected }: { g: GroupValue; selected: string }) {
   return (
@@ -35,14 +23,18 @@ export function Switcher({ g, selected }: { g: GroupValue; selected: string }) {
             scroll={false}
             aria-current={on ? 'page' : undefined}
             className={cx(
-              'inline-flex h-8 items-center gap-1.5 rounded-[6px] border px-2.5 font-medium no-underline transition-colors',
+              'inline-flex h-8 items-center gap-1.5 rounded-[10px] border px-2.5 font-medium no-underline transition-colors',
               on ? 'border-ink bg-ink !text-white' : 'border-control bg-surface text-ink hover:bg-raised',
             )}
           >
+            <span
+              aria-hidden="true"
+              className={cx(
+                'h-2 w-2 rounded-full',
+                c.held ? 'bg-control' : c.creates ? 'bg-positive' : 'bg-negative',
+              )}
+            />
             {c.name}
-            {c.openFindings.length > 0 && (
-              <span className={cx('text-xs tabular-nums', on ? 'text-white/80' : 'text-muted')}>{c.openFindings.length}</span>
-            )}
           </Link>
         );
       })}
@@ -50,94 +42,141 @@ export function Switcher({ g, selected }: { g: GroupValue; selected: string }) {
   );
 }
 
-export function ManagerPanel({ c, name }: { c: CompanyValue; name: (id: string) => string }) {
-  const tasks = [...c.openFindings].sort(
-    (a, b) => ['block', 'quarantine', 'warning'].indexOf(a.severity) - ['block', 'quarantine', 'warning'].indexOf(b.severity),
-  );
-  const cleanShare = c.rowsRead ? c.rowsClean / c.rowsRead : 0;
-  const answer = tasks.length
-    ? `${tasks.length} ${tasks.length === 1 ? 'tarea abierta' : 'tareas abiertas'} antes de que su archivo entre completo al número del grupo.`
-    : 'Nada pendiente: su archivo entra completo al número del grupo.';
+function Figure({
+  label,
+  value,
+  note,
+  children,
+}: {
+  label: string;
+  value: string;
+  note?: React.ReactNode;
+  children?: React.ReactNode;
+}) {
   return (
-    <section aria-labelledby="q-corregir" className="flex min-w-0 flex-col rounded-[8px] border border-border bg-surface">
-      <header className="flex flex-col gap-1.5 px-5 pt-5 sm:px-6">
+    <div className="flex min-w-0 flex-col gap-1 rounded-[14px] border border-border bg-surface px-4 py-3">
+      <span className="text-xs text-muted">{label}</span>
+      <MetricValue text={value} className="text-[28px] leading-tight" />
+      {children}
+      {note && <span className="text-xs text-muted">{note}</span>}
+    </div>
+  );
+}
+
+export function ManagerPanel({
+  c,
+  g,
+  name,
+}: {
+  c: CompanyValue;
+  g: GroupValue;
+  name: (id: string) => string;
+}) {
+  const tasks = tasksOf(c, name);
+  const cleanShare = c.rowsRead ? c.rowsClean / c.rowsRead : 0;
+  const gap = `${Math.abs(c.spread * 100).toFixed(1)} puntos ${c.spread >= 0 ? 'sobre' : 'bajo'} el WACC`;
+  const answer = c.held
+    ? 'Retenida por un bloqueo en su archivo: todavía no aporta al número del grupo.'
+    : c.creates
+      ? `Rinde ${pct(c.roic)} sobre su capital, ${gap}: suma ${money(c.evaGtq)} de EVA al grupo.`
+      : `Rinde ${pct(c.roic)} sobre su capital, ${gap}: resta ${money(Math.abs(c.evaGtq))} de EVA al grupo.`;
+  const scale = Math.max(2 * g.wacc, c.roic * 1.1, 0.01);
+
+  return (
+    <section aria-labelledby="q-empresa" className="flex min-w-0 flex-col gap-5 card p-5 sm:px-6">
+      <header className="flex flex-col gap-1.5">
         <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
-          <h2 id="q-corregir" className="m-0 text-base font-semibold">
-            ¿Qué tiene que corregir {c.name}?
+          <h2 id="q-empresa" className="m-0 text-base font-semibold">
+            ¿Cómo le va a {c.name}?
           </h2>
-          <Pill tone={c.delivery.tone}>{c.delivery.text}</Pill>
+          <Pill tone={c.held ? 'neutral' : c.creates ? 'positive' : 'negative'}>
+            {c.held ? 'Retenida' : c.creates ? 'Crea valor' : 'Destruye valor'}
+          </Pill>
         </div>
         <p className="m-0 max-w-[920px] text-xl leading-snug">{answer}</p>
       </header>
-      <div className="grid grid-cols-1 gap-6 px-5 pb-5 pt-5 sm:px-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
-        <div className="flex min-w-0 flex-col">
-          <div className="pb-1 text-xs text-muted">Tareas, de la más urgente a la menos</div>
-          {tasks.length ? (
-            <ol className="m-0 flex list-none flex-col p-0">
-              {tasks.map((f) => {
-                const t = taskOf(f, c, name);
-                const sev = SEVERITY[f.severity];
-                return (
-                  <li key={f.id} className="flex flex-col gap-1 border-b border-rule py-3 last:border-b-0">
-                    <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                      <Link
-                        href={`/load#${encodeURIComponent(f.id)}`}
-                        className="min-w-0 font-medium underline decoration-control underline-offset-[3px] hover:decoration-ink"
-                      >
-                        {t.title}
-                      </Link>
-                      <Pill tone={sev.tone}>{sev.text}</Pill>
-                    </div>
-                    <p className="m-0 text-muted">{t.detail}</p>
-                  </li>
-                );
-              })}
-            </ol>
-          ) : (
-            <div className="rounded-[8px] border border-dashed border-control px-4 py-3 text-muted">
-              Sin hallazgos abiertos. {c.resolvedFindings.length ? `${c.resolvedFindings.length} ya resueltos en Carga.` : ''}
+
+      {!c.held && (
+        <div key={c.id} className="grid grid-cols-2 gap-3 @4xl/main:grid-cols-4">
+          <Figure
+            label="Ingresos al grupo"
+            value={money(c.revenue)}
+            note={`${pct(c.revenueShare, 0)} de los ingresos del grupo`}
+          />
+          <Figure label="EBIT antes de eliminaciones" value={money(c.ebit)} note={`ROCE ${pct(c.roce)}`} />
+          <Figure label="ROIC" value={pct(c.roic)} note={`WACC ${pct(g.wacc)} (la marca)`}>
+            <div className="relative mt-1 h-1.5 w-full rounded-full bg-[var(--track)]" aria-hidden="true">
+              <div
+                className="qm-grow-x absolute inset-y-0 left-0 rounded-full"
+                style={{
+                  width: `${Math.min(100, (Math.max(0, c.roic) / scale) * 100)}%`,
+                  background: c.creates ? 'var(--positive)' : 'var(--negative)',
+                  animationDelay: '250ms',
+                }}
+              />
+              <div
+                className="absolute -bottom-1 -top-1 w-px bg-ink"
+                style={{ left: `${(g.wacc / scale) * 100}%` }}
+              />
             </div>
-          )}
+          </Figure>
+          <Figure
+            label="EVA, en GTQ"
+            value={money(c.evaGtq)}
+            note={c.evaGtq < 0 ? 'Destruye valor' : 'Crea valor'}
+          />
         </div>
-        <div className="flex min-w-0 flex-col gap-5">
-          <div className="flex flex-col">
-            <div className="pb-1 text-xs text-muted">Calidad de la entrega</div>
-            <Line label="Filas leídas">{int(c.rowsRead)}</Line>
-            <Line label="Filas limpias" strong>
-              {int(c.rowsClean)} · {pct(cleanShare)}
-            </Line>
-            <div className="mt-2 h-1.5 w-full rounded-full bg-[var(--track)]" aria-hidden="true">
-              <div className="h-1.5 rounded-full bg-ink" style={{ width: `${cleanShare * 100}%` }} />
-            </div>
-          </div>
-          <div className="flex flex-col">
-            <div className="pb-1 text-xs text-muted">Aporte al grupo, en GTQ</div>
-            {c.held ? (
-              <p className="m-0 py-2 text-muted">Retenida por bloqueo: todavía no aporta al número.</p>
-            ) : (
-              <>
-                <Line label="Ingresos">
-                  {money(c.revenue)} · {pct(c.revenueShare, 0)}
-                </Line>
-                <Line label="EBIT antes de eliminaciones">{money(c.ebit)}</Line>
-                <Line label="ROIC · ROCE">
-                  {pct(c.roic)} · {pct(c.roce)}
-                </Line>
-                <Line label="EVA" strong>
-                  <span className={c.evaGtq < 0 ? 'text-negative' : undefined}>{money(c.evaGtq, { sign: true })}</span>
-                </Line>
-              </>
-            )}
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Link href={`/load/${c.id}/mapping`} className={buttonClass('secondary', 'sm')}>
-              Ver su mapeo
-            </Link>
-            <Link href={`/consolidated?line=revenue&company=${c.id}`} className={buttonClass('secondary', 'sm')}>
+      )}
+
+      {/* The file's state: a footnote, with the fixes folded away for whoever has to chase them. */}
+      <div className="flex flex-col gap-2 border-t border-rule pt-3 text-[13px] text-muted">
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
+          <span>
+            Su archivo: {int(c.rowsClean)} de {int(c.rowsRead)} filas limpias ({pct(cleanShare, 0)})
+            {tasks.length ? '' : ' · sin pendientes'}
+          </span>
+          <span className="flex flex-wrap gap-x-4">
+            <Link
+              href={`/consolidated?line=revenue&company=${c.id}`}
+              className="text-muted underline decoration-control underline-offset-[3px] hover:text-ink"
+            >
               Ver su rastro
             </Link>
-          </div>
+            <Link
+              href={`/load/${c.id}/mapping`}
+              className="text-muted underline decoration-control underline-offset-[3px] hover:text-ink"
+            >
+              Ver su mapeo
+            </Link>
+          </span>
         </div>
+        {tasks.length > 0 && (
+          <details className="group">
+            <summary className="w-fit cursor-pointer list-none underline decoration-dotted underline-offset-[3px] hover:text-ink">
+              {tasks.length} {tasks.length === 1 ? 'ajuste pendiente' : 'ajustes pendientes'} en su archivo
+              <span
+                className="ml-1 inline-block transition-transform group-open:rotate-90"
+                aria-hidden="true"
+              >
+                ›
+              </span>
+            </summary>
+            <ol className="m-0 mt-2 flex list-none flex-col gap-1.5 p-0">
+              {tasks.map((t) => (
+                <li key={t.key} className="flex flex-wrap items-baseline gap-x-2">
+                  <span className="text-xs">{SEVERITY[t.severity] ?? t.severity}:</span>
+                  <Link
+                    href={t.href}
+                    className="text-ink underline decoration-control underline-offset-[3px]"
+                  >
+                    {t.title}
+                  </Link>
+                  <span>{t.detail}</span>
+                </li>
+              ))}
+            </ol>
+          </details>
+        )}
       </div>
     </section>
   );

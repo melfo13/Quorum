@@ -1,14 +1,17 @@
 'use client';
 
 /**
- * Scenario controls. The values live in the URL (?usd=5&mxn=-3&wacc=12) so a scenario can be
- * linked and the server recomputes it with the same engine. Updates are debounced.
+ * Scenario controls. The values live in the URL (?crc=5&wacc=12, one parameter per currency the
+ * group's companies use) so a scenario can be linked and the server recomputes it with the same
+ * engine. Updates are debounced.
  */
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, useTransition } from 'react';
 import { cx } from '@/components/ui/primitives';
 
-export type ControlValues = { usd: number; mxn: number; wacc: number };
+/** fx: currency code → change of its rate in %, positive = the group currency weakens. */
+export type ControlValues = { fx: Record<string, number>; wacc: number };
+export type FxControl = { code: string; name: string };
 
 function Slider({
   id,
@@ -63,7 +66,19 @@ function Slider({
 
 const signed = (v: number) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v)} %`;
 
-export function Controls({ initial, baseWacc }: { initial: ControlValues; baseWacc: number }) {
+export function Controls({
+  initial,
+  baseWacc,
+  currencies,
+  groupName,
+}: {
+  initial: ControlValues;
+  baseWacc: number;
+  /** The currencies the companies report in, other than the group's. */
+  currencies: FxControl[];
+  /** The group currency's name, for the hints ("el quetzal se debilita"). */
+  groupName: string;
+}) {
   const router = useRouter();
   const path = usePathname();
   const [v, setV] = useState(initial);
@@ -77,8 +92,7 @@ export function Controls({ initial, baseWacc }: { initial: ControlValues; baseWa
     }
     const t = setTimeout(() => {
       const q = new URLSearchParams();
-      if (v.usd) q.set('usd', String(v.usd));
-      if (v.mxn) q.set('mxn', String(v.mxn));
+      for (const [code, x] of Object.entries(v.fx)) if (x) q.set(code.toLowerCase(), String(x));
       if (v.wacc !== baseWacc) q.set('wacc', String(v.wacc));
       const s = q.toString();
       start(() => router.replace(s ? `${path}?${s}` : path, { scroll: false }));
@@ -86,12 +100,12 @@ export function Controls({ initial, baseWacc }: { initial: ControlValues; baseWa
     return () => clearTimeout(t);
   }, [v, baseWacc, path, router]);
 
-  const changed = v.usd !== 0 || v.mxn !== 0 || v.wacc !== baseWacc;
+  const changed = Object.values(v.fx).some((x) => x !== 0) || v.wacc !== baseWacc;
 
   return (
     <section
       aria-label="Supuestos del escenario"
-      className="flex flex-col gap-4 rounded-[8px] border border-border bg-surface p-5"
+      className="flex flex-col gap-4 card p-5"
     >
       <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
         <h2 className="m-0 text-base font-semibold">Supuestos del escenario</h2>
@@ -105,36 +119,28 @@ export function Controls({ initial, baseWacc }: { initial: ControlValues; baseWa
           <button
             type="button"
             disabled={!changed}
-            onClick={() => setV({ usd: 0, mxn: 0, wacc: baseWacc })}
-            className="inline-flex h-11 cursor-pointer items-center rounded-[6px] border border-control bg-surface px-3 font-medium hover:bg-raised disabled:cursor-not-allowed disabled:border-border disabled:text-muted sm:h-8"
+            onClick={() => setV({ fx: Object.fromEntries(currencies.map((c) => [c.code, 0])), wacc: baseWacc })}
+            className="inline-flex h-11 cursor-pointer items-center rounded-[10px] border border-control bg-surface px-3 font-medium hover:bg-raised disabled:cursor-not-allowed disabled:border-border disabled:text-muted sm:h-8"
           >
             Restablecer
           </button>
         </div>
       </div>
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <Slider
-          id="sim-usd"
-          label="Quetzal vs USD"
-          hint="+5 % = el quetzal se debilita"
-          value={v.usd}
-          min={-15}
-          max={15}
-          step={1}
-          format={signed}
-          onChange={(usd) => setV((x) => ({ ...x, usd }))}
-        />
-        <Slider
-          id="sim-mxn"
-          label="Quetzal vs MXN"
-          hint="+5 % = el quetzal se debilita"
-          value={v.mxn}
-          min={-15}
-          max={15}
-          step={1}
-          format={signed}
-          onChange={(mxn) => setV((x) => ({ ...x, mxn }))}
-        />
+        {currencies.map((c) => (
+          <Slider
+            key={c.code}
+            id={`sim-${c.code.toLowerCase()}`}
+            label={`Tipo de cambio ${c.code}`}
+            hint={`+5 % = el ${groupName} se debilita frente al ${c.name}`}
+            value={v.fx[c.code] ?? 0}
+            min={-15}
+            max={15}
+            step={1}
+            format={signed}
+            onChange={(x) => setV((cur) => ({ ...cur, fx: { ...cur.fx, [c.code]: x } }))}
+          />
+        ))}
         <Slider
           id="sim-wacc"
           label="WACC"

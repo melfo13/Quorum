@@ -1,38 +1,48 @@
 @import 'tailwindcss';
 
 /*
- * PulseGroup tokens. Style: achromatic ledger (taste skill, app screens).
+ * Quórum tokens. Style: achromatic ledger (taste skill, app screens).
  * The chrome holds no colour. Colour is for status pills and for the one data hue (--accent),
  * which marks the screen's main data element and the source cell a figure came from.
  */
 :root {
-  --ground: #f9fafb;
-  --surface: #ffffff;
-  --raised: #f6f7f8;
-  --active: #eeeeee;
-  --border: #e8e8e8;
-  --rule: #f0f0f0;
-  --control: #d1d5db;
-  --text: #111111;
-  --muted: #5f6368;
-  --faint: #6b6b6b;
-  --primary: #111111;
-  --accent: #1d5fbf;
-  --accent-tint: #e8f0fb;
-  --positive: #247b50;
-  --negative: #c4242a;
-  --pill-positive-bg: #dcfae5;
-  --pill-positive-ink: #04250e;
-  --pill-negative-bg: #ffedea;
-  --pill-negative-ink: #831c1e;
-  --pill-neutral-bg: #f1f3f4;
-  --pill-neutral-ink: #111111;
-  --pill-warning-bg: #fffbeb;
-  --pill-warning-ink: #92400e;
-  --pill-warning-border: #fde68a;
-  --track: #e8e8e8;
-  --bar-muted: #9aa0a6;
-  --bar-step: #d1d5db;
+  --ground: #f3f6f5;
+  --surface: #fbfdff;
+  --raised: #f4f7f8;
+  --active: #eaf0ee;
+  --border: rgba(15, 30, 60, 0.06);
+  --rule: rgba(15, 30, 60, 0.06);
+  --control: #d5dce3;
+  --text: #16202e;
+  --muted: #7b8794;
+  --faint: #7b8794;
+  --primary: #16202e;
+  --accent: #3f8f4a;
+  --accent-tint: #e8f5e9;
+  --positive: #0e9f6e;
+  --negative: #d0453f;
+  --pill-positive-bg: #d9f5ea;
+  --pill-positive-ink: #055c40;
+  --pill-negative-bg: #fdecea;
+  --pill-negative-ink: #a3302b;
+  --pill-neutral-bg: #eef2f6;
+  --pill-neutral-ink: #16202e;
+  --pill-warning-bg: #f59e42;
+  --pill-warning-ink: #2b1600;
+  --pill-warning-border: #f59e42;
+  --track: #e6eaee;
+  --bar-muted: #a9b4bf;
+  --bar-step: #cfd8df;
+  /* Soft frosted-glass style: one fresh brand colour, pastel chips, glass shell, near-white cards.
+     The brand (sage) is chrome only: navigation, logo, progress, checks. Status has its own colours:
+     --positive (emerald) means "creates value", --negative means "destroys it"; never the brand. */
+  --brand: #6fbf73;
+  --brand-tint: #e8f5e9;
+  --chip-blue: #e3f1fd;
+  --chip-yellow: #fff4cc;
+  --chip-lilac: #f1e4fa;
+  --glass: rgba(255, 255, 255, 0.65);
+  --card-shadow: 0 2px 12px rgba(30, 60, 100, 0.05);
 }
 
 @theme inline {
@@ -59,10 +69,17 @@
   --color-warn-bg: var(--pill-warning-bg);
   --color-warn-ink: var(--pill-warning-ink);
   --color-warn-border: var(--pill-warning-border);
+  --color-brand: var(--brand);
+  --color-brand-tint: var(--brand-tint);
+  --color-chip-blue: var(--chip-blue);
+  --color-chip-yellow: var(--chip-yellow);
+  --color-chip-lilac: var(--chip-lilac);
+  --color-glass: var(--glass);
+  --font-display: var(--font-outfit), var(--font-geist-sans), system-ui, sans-serif;
   --font-sans: var(--font-geist-sans), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
-  --radius-card: 8px;
-  --radius-control: 6px;
+  --radius-card: 20px;
+  --radius-control: 10px;
 }
 
 html {
@@ -72,7 +89,12 @@ html {
 
 body {
   margin: 0;
-  background: var(--ground);
+  /* A soft blurred wash of the brand behind the glass shell. */
+  background:
+    radial-gradient(900px 600px at 8% -10%, rgba(111, 191, 115, 0.22), transparent 60%),
+    radial-gradient(800px 600px at 100% 0%, rgba(227, 241, 253, 0.9), transparent 60%),
+    radial-gradient(700px 500px at 60% 110%, rgba(241, 228, 250, 0.7), transparent 60%), var(--ground);
+  background-attachment: fixed;
   color: var(--text);
   font-family: var(--font-sans);
   font-size: 14px;
@@ -84,6 +106,29 @@ body {
 @layer base {
   a {
     color: inherit;
+  }
+  /* Rounded geometric sans for titles; the body stays in Geist. */
+  h1,
+  h2 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+}
+
+@layer components {
+  /* A card: near-white, 20px radius, a hairline border and a shadow you barely see. Cards are
+     separated by space, not contrast. */
+  .card {
+    border-radius: var(--radius-card);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    box-shadow: var(--card-shadow);
+  }
+  /* Big figures (the metric pattern): the display face, proportional digits. */
+  .figure {
+    font-family: var(--font-display);
+    font-variant-numeric: proportional-nums;
+    letter-spacing: -0.02em;
   }
 }
 
@@ -126,6 +171,55 @@ body {
   text-align: right;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+}
+
+/*
+ * Data motion. Figures arrive once: blocks fade up, bars grow from their baseline, cards land in
+ * sequence. Transform and opacity only, so nothing reflows; reduced motion shows the final state.
+ */
+@keyframes pg-fade {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+@keyframes qm-grow-x {
+  from {
+    transform: scaleX(0);
+  }
+}
+@keyframes qm-grow-y {
+  from {
+    transform: scaleY(0);
+  }
+}
+.pg-fade {
+  animation: pg-fade 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.qm-grow-x,
+.qm-grow-x-end,
+.qm-grow-up,
+.qm-grow-down {
+  transform-box: fill-box;
+  animation-duration: 900ms;
+  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+  animation-fill-mode: both;
+}
+.qm-grow-x,
+.qm-grow-x-end {
+  animation-name: qm-grow-x;
+  transform-origin: left center;
+}
+.qm-grow-x-end {
+  transform-origin: right center;
+}
+.qm-grow-up,
+.qm-grow-down {
+  animation-name: qm-grow-y;
+  transform-origin: center bottom;
+}
+.qm-grow-down {
+  transform-origin: center top;
 }
 
 @media (prefers-reduced-motion: reduce) {

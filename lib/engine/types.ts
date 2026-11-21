@@ -81,6 +81,8 @@ export type Fact = {
   localName: string;
   groupAccount: string | null;
   counterpartyId: string | null; // null = third party
+  /** The counterparty as the file writes it, when the row names one. */
+  counterpartyRaw?: string;
   currency: string;
   /** Natural sign (revenue +, expense −, balances +), already multiplied by the scale. */
   amountLocal: number;
@@ -124,6 +126,7 @@ export type RuleId =
   | 'ACCOUNT_UNMAPPED'
   | 'IC_ASYMMETRIC'
   | 'IC_MISSING'
+  | 'IC_OUTSIDE'
   | 'KPI_MISMATCH';
 
 export type Place = { file: string; sheet: string; row: number; column?: string };
@@ -146,7 +149,8 @@ export type Finding = {
   expected: string;
   actual: string;
   /** Signed effect on the group number if the error had gone in, in group cents. */
-  groupImpact: { metric: 'revenue' | 'ebit' | 'balance' | 'none'; cents: number } | null;
+  /** ebit for operating lines; net for what sits below EBIT (financial expense, income tax). */
+  groupImpact: { metric: 'revenue' | 'ebit' | 'net' | 'balance' | 'none'; cents: number } | null;
   impactText: string;
   action: FindingAction;
   status: 'open' | 'resolved';

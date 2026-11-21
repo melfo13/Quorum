@@ -21,7 +21,7 @@ export function Question({
   className?: string;
 }) {
   return (
-    <section aria-labelledby={id} className={cx('flex min-w-0 flex-col rounded-[8px] border border-border bg-surface', className)}>
+    <section aria-labelledby={id} className={cx('flex min-w-0 flex-col card', className)}>
       <header className="flex flex-col gap-1.5 px-5 pt-5 sm:px-6">
         <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
           <h2 id={id} className="m-0 text-base font-semibold">

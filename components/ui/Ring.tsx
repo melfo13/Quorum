@@ -27,7 +27,7 @@ export function Ring({
   tone?: 'ink' | 'accent';
 }) {
   const f = Math.max(0, Math.min(1, fill));
-  const stroke = tone === 'accent' ? 'var(--accent)' : 'var(--text)';
+  const stroke = tone === 'accent' ? 'var(--accent)' : 'var(--brand)';
   const angle = mark !== undefined ? mark * 2 * Math.PI - Math.PI / 2 : 0;
   const at = (r: number) => ({ x: SIZE / 2 + r * Math.cos(angle), y: SIZE / 2 + r * Math.sin(angle) });
   return (

@@ -1,12 +1,13 @@
 import { ManagerPanel, Switcher } from '@/components/companies/ManagerPanel';
 import { valueByCompany } from '@/components/companies/model';
+import { GroupGraph } from '@/components/companies/GroupGraph';
 import { ValueTable } from '@/components/companies/ValueTable';
-import { TitleRow } from '@/components/ui/primitives';
+import { Panel, TitleRow } from '@/components/ui/primitives';
 import { money, pct } from '@/lib/format';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { getResult, getSource } from '@/lib/server/state';
 
-export const metadata = { title: 'Empresas · PulseGroup' };
+export const metadata = { title: 'Empresas · Quórum' };
 
 type Search = Promise<{ empresa?: string }>;
 
@@ -20,6 +21,8 @@ export default async function CompaniesPage({ searchParams }: { searchParams: Se
   const selected = g.companies.find((c) => c.id === q.empresa) ?? g.weakest ?? g.companies[0];
 
   const creating = g.measurable.filter((c) => c.creates).length;
+  // Revenue eliminated between companies: what the graph's arrows add up to.
+  const icCents = -(r.pl.find((l) => l.id === 'revenue')?.eliminations ?? 0);
   const held = g.companies.filter((c) => c.held);
   const worst = g.destroyers.sort((a, b) => a.evaGtq - b.evaGtq)[0];
   const parts = [
@@ -33,11 +36,21 @@ export default async function CompaniesPage({ searchParams }: { searchParams: Se
   return (
     <>
       <TitleRow title="Empresas" sub={parts.filter(Boolean).join(' ')} />
+      <Panel
+        title="¿Cómo se relaciona el grupo?"
+        aside={
+          icCents
+            ? `${money(icCents)} de ventas entre empresas se eliminan al consolidar`
+            : 'Sin ventas entre empresas que eliminar'
+        }
+      >
+        <GroupGraph companies={g.companies} matches={r.matches} wacc={g.wacc} selected={selected?.id} />
+      </Panel>
       <ValueTable g={g} selected={selected?.id} />
       {selected && (
         <div className="flex flex-col gap-3">
           <Switcher g={g} selected={selected.id} />
-          <ManagerPanel c={selected} name={name} />
+          <ManagerPanel c={selected} g={g} name={name} />
         </div>
       )}
     </>

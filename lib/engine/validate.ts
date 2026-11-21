@@ -167,6 +167,8 @@ export function validateRows(
       if (!fixed && f.amountLocal <= 0) continue;
       const id = `SIGN_INVERTED:${f.id}`;
       const g = groupCents(f, rates) ?? 0;
+      // Financial expense and income tax sit below EBIT: an inverted sign there moves net income, not EBIT.
+      const operating = isOperating(acc);
       if (!fixed) hold([f], id);
       out.push({
         id,
@@ -178,8 +180,8 @@ export function validateRows(
         factIds: [f.id],
         expected: `Gasto con signo ${mapping.expenseSign === 'negative' ? 'negativo' : 'positivo'}, como el resto del archivo`,
         actual: `${f.localName || f.localAccount}, ${monthName(f.period)}: ${local(f.amountAsTyped, mapping.currency)}`,
-        groupImpact: { metric: 'ebit', cents: 2 * Math.abs(g) },
-        impactText: `Inflaba el EBIT en ${money(2 * Math.abs(g))}`,
+        groupImpact: { metric: operating ? 'ebit' : 'net', cents: 2 * Math.abs(g) },
+        impactText: `Inflaba ${operating ? 'el EBIT' : 'la utilidad neta'} en ${money(2 * Math.abs(g))}`,
         action: { kind: 'fix-sign', label: 'Corregir signo', factIds: [f.id] },
         status: fixed ? 'resolved' : 'open',
         resolutionText: fixed ? 'Signo corregido; la fila entra al número' : undefined,
@@ -197,11 +199,17 @@ export function validateRows(
       const fs = r.factIds.map((id) => factById.get(id)!).filter(Boolean);
       const id = `DUPLICATE_ROW:${r.key}`;
       hold(fs, id);
-      const rev = fs.reduce((a, f) => {
-        const acc = f.groupAccount ? ACCOUNT.get(f.groupAccount) : undefined;
-        return a + (acc && isOperating(acc) ? (groupCents(f, rates) ?? 0) : 0);
-      }, 0);
+      const sumWhere = (keep: (acc: NonNullable<ReturnType<typeof ACCOUNT.get>>) => boolean) =>
+        fs.reduce((a, f) => {
+          const acc = f.groupAccount ? ACCOUNT.get(f.groupAccount) : undefined;
+          return a + (acc && keep(acc) ? (groupCents(f, rates) ?? 0) : 0);
+        }, 0);
       const isRevenue = fs.some((f) => f.groupAccount && ACCOUNT.get(f.groupAccount)?.kind === 'revenue');
+      const operating = sumWhere(isOperating);
+      // A duplicated row below EBIT (financial expense, income tax) inflates net income instead.
+      const below = sumWhere((acc) => acc.statement === 'PL' && !isOperating(acc));
+      const net = !isRevenue && !operating && below !== 0;
+      const rev = net ? below : operating;
       out.push({
         id,
         ruleId: 'DUPLICATE_ROW',
@@ -212,8 +220,44 @@ export function validateRows(
         factIds: fs.map((f) => f.id),
         expected: 'Cada registro una sola vez',
         actual: `La fila ${r.row} repite la ${first}`,
-        groupImpact: { metric: isRevenue ? 'revenue' : 'ebit', cents: rev },
-        impactText: `Inflaba ${isRevenue ? 'ingresos' : 'el EBIT'} en ${money(Math.abs(rev))}`,
+        groupImpact: { metric: isRevenue ? 'revenue' : net ? 'net' : 'ebit', cents: rev },
+        impactText: `Inflaba ${isRevenue ? 'ingresos' : net ? 'la utilidad neta' : 'el EBIT'} en ${money(Math.abs(rev))}`,
+        action: { kind: 'none', label: 'Ver filas' },
+        status: 'open',
+      });
+    }
+
+    // IC_OUTSIDE: an amount in an intercompany account whose counterparty is not a group company.
+    // It cannot be eliminated or reconciled with anyone, so, like an unreconciled pair, it stays out
+    // of the group number until the file names a group company (or moves it to a third-party account).
+    // Income statement only: holding one side of an intercompany balance would unbalance the sheet.
+    const outside = facts.filter((f) => {
+      const acc = f.groupAccount ? ACCOUNT.get(f.groupAccount) : undefined;
+      return acc?.ic && acc.statement === 'PL' && (!f.counterpartyId || f.counterpartyId === mapping.companyId);
+    });
+    if (outside.length) {
+      const id = `IC_OUTSIDE:${mapping.companyId}`;
+      hold(outside, id);
+      const names = [...new Set(outside.map((f) => f.counterpartyRaw ?? 'sin contraparte'))].sort();
+      const cents = (kind: string) =>
+        outside.reduce((a, f) => a + (ACCOUNT.get(f.groupAccount!)?.kind === kind ? (groupCents(f, rates) ?? 0) : 0), 0);
+      const sales = cents('revenue');
+      const purchases = cents('cogs');
+      const rows = new Set(outside.map((f) => f.rowKey)).size;
+      out.push({
+        id,
+        ruleId: 'IC_OUTSIDE',
+        severity: 'quarantine',
+        companyIds: [mapping.companyId],
+        places: outside.slice(0, 3).map(place),
+        sourceCellIds: outside.map((f) => f.sourceCellId),
+        factIds: outside.map((f) => f.id),
+        expected: 'Una contraparte que sea empresa del grupo, para eliminar la operación',
+        actual: `${rows} filas entre empresas con ${names.map((n) => `"${n}"`).join(', ')}, que no ${names.length === 1 ? 'es empresa' : 'son empresas'} del grupo`,
+        groupImpact: sales ? { metric: 'revenue', cents: sales } : { metric: 'ebit', cents: Math.abs(purchases) },
+        impactText: sales
+          ? `Inflaba ingresos en ${money(sales)}; también costos por ${money(Math.abs(purchases))}`
+          : `Inflaba costos en ${money(Math.abs(purchases))}`,
         action: { kind: 'none', label: 'Ver filas' },
         status: 'open',
       });

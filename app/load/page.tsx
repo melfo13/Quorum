@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
-import { resetDemo } from '@/app/actions';
+import { fixSign, resetDemo } from '@/app/actions';
 import { ClearData } from '@/components/upload/ClearData';
 import { FilesTable } from '@/components/load/FilesTable';
 import { FindingActions } from '@/components/load/FindingActions';
+import { FindingCluster } from '@/components/load/FindingCluster';
 import { FindingRow, type FindingRowView } from '@/components/load/FindingRow';
 import { Gate, type GateCell } from '@/components/load/Gate';
 import { RULE_NAMES, effectParts, statusOf, whereText } from '@/components/load/labels';
@@ -16,7 +17,7 @@ import { getExcerpts } from '@/lib/server/excerpt';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { getDataset, getResult, getSource } from '@/lib/server/state';
 
-export const metadata: Metadata = { title: 'Carga de presupuestos · PulseGroup' };
+export const metadata: Metadata = { title: 'Configuración · Quórum' };
 
 const list = (names: string[]) =>
   names.length <= 1 ? (names[0] ?? '') : `${names.slice(0, -1).join(', ')} y ${names[names.length - 1]}`;
@@ -25,7 +26,7 @@ const list = (names: string[]) =>
 const toggleText = (label: string) => (/^(Ver|View) /.test(label) ? label : 'Ver filas');
 
 export default async function LoadPage() {
-  if ((await getSource()).kind === 'none') return <EmptyState title="Carga de presupuestos" question="¿Qué no puede entrar al número del grupo?" />;
+  if ((await getSource()).kind === 'none') return <EmptyState title="Configuración" question="Sube los presupuestos del grupo y revisa qué no puede entrar al número." />;
 
   const r = await getResult();
   const ds = getDataset();
@@ -136,10 +137,53 @@ export default async function LoadPage() {
   ];
   const groups = GROUPS.map((g) => ({ ...g, items: r.findings.filter(g.pick) })).filter((g) => g.items.length);
 
+  // The same sign error in one company and one account is one problem: it is listed once, with the
+  // total effect and one action, and its rows stay inside. Every other finding keeps its own row.
+  const factById = new Map(r.facts.map((x) => [x.id, x]));
+  type Entry = { kind: 'one'; f: Finding } | { kind: 'many'; key: string; items: Finding[] };
+  const clustered = (items: Finding[]): Entry[] => {
+    const out: Entry[] = [];
+    const byKey = new Map<string, Extract<Entry, { kind: 'many' }>>();
+    for (const f of items) {
+      const fact = f.action.kind === 'fix-sign' && f.status === 'open' ? factById.get(f.factIds[0]) : undefined;
+      if (!fact) {
+        out.push({ kind: 'one', f });
+        continue;
+      }
+      const key = `${f.ruleId}|${f.companyIds[0]}|${fact.localAccount}`;
+      let e = byKey.get(key);
+      if (!e) {
+        e = { kind: 'many', key, items: [] };
+        byKey.set(key, e);
+        out.push(e);
+      }
+      e.items.push(f);
+    }
+    return out.map((e) => (e.kind === 'many' && e.items.length === 1 ? { kind: 'one', f: e.items[0] } : e));
+  };
+  const clusterView = (items: Finding[]) => {
+    const first = items[0];
+    const fact = factById.get(first.factIds[0]);
+    const n = items.length;
+    const cents = items.reduce((a, f) => a + Math.abs(f.groupImpact?.cents ?? 0), 0);
+    return {
+      id: `grupo:${first.ruleId}:${first.companyIds[0]}:${fact?.localAccount ?? ''}`,
+      rule: RULE_NAMES[first.ruleId],
+      status: statusOf(first),
+      where: `${nameOf(first.companyIds[0])} · ${n} filas`,
+      found: `${fact?.localName || fact?.localAccount}: signo al revés en ${n === 12 ? 'los 12 meses' : `${n} meses`}`,
+      expected: first.expected,
+      figure: money(cents),
+      words: effectParts(first).words,
+      count: n,
+      childIds: items.map((f) => f.id),
+    };
+  };
+
   return (
     <>
       <TitleRow
-        title="Carga de presupuestos"
+        title="Configuración"
         sub={
           <span className="flex max-w-[620px] flex-col gap-1">
             <span>{sub}</span>
@@ -182,12 +226,12 @@ export default async function LoadPage() {
         aside={`${int(r.confidence.rowsRead)} filas leídas · ${int(r.confidence.rowsClean)} limpias · ${r.findings.length} ${r.findings.length === 1 ? 'hallazgo' : 'hallazgos'}`}
       >
         {r.findings.length === 0 ? (
-          <p className="m-0 rounded-[8px] border border-dashed border-control px-4 py-2.5 text-muted">
+          <p className="m-0 rounded-[16px] border border-dashed border-control px-4 py-2.5 text-muted">
             Sin hallazgos. Todas las filas de los seis archivos entraron al número del grupo.
           </p>
         ) : (
-          <table className="w-full border-collapse max-lg:block">
-            <thead className="max-lg:hidden">
+          <table className="w-full border-collapse @max-4xl/main:block">
+            <thead className="@max-4xl/main:hidden">
               <tr>
                 <th scope="col" className={head}>
                   Regla
@@ -210,12 +254,12 @@ export default async function LoadPage() {
               </tr>
             </thead>
             {groups.map((g) => (
-              <tbody key={g.key} className="max-lg:block">
-                <tr className="max-lg:block">
+              <tbody key={g.key} className="@max-4xl/main:block">
+                <tr className="@max-4xl/main:block">
                   <th
                     scope="colgroup"
                     colSpan={6}
-                    className="border-b border-border bg-raised px-3 py-2 text-left font-normal max-lg:block max-lg:rounded-[6px] max-lg:border-0"
+                    className="border-b border-border bg-raised px-3 py-2 text-left font-normal @max-4xl/main:block @max-4xl/main:rounded-[10px] @max-4xl/main:border-0"
                   >
                     <span className="font-semibold">{g.title}</span>
                     <span className="ml-2 rounded-full bg-surface px-1.5 text-xs font-medium tabular-nums ring-1 ring-inset ring-border">
@@ -224,14 +268,37 @@ export default async function LoadPage() {
                     <span className="ml-3 text-xs text-muted">{g.note}</span>
                   </th>
                 </tr>
-                {g.items.map((f) => (
-                  <FindingRow
-                    key={f.id}
-                    f={view(f)}
-                    excerpts={getExcerpts(ds, f.sourceCellIds, { max: 2 })}
-                    action={<FindingActions finding={f} mappings={ds.mappings} />}
-                  />
-                ))}
+                {clustered(g.items).map((e) =>
+                  e.kind === 'one' ? (
+                    <FindingRow
+                      key={e.f.id}
+                      f={view(e.f)}
+                      excerpts={getExcerpts(ds, e.f.sourceCellIds, { max: 2 })}
+                      action={<FindingActions finding={e.f} mappings={ds.mappings} />}
+                    />
+                  ) : (
+                    <FindingCluster
+                      key={e.key}
+                      v={clusterView(e.items)}
+                      action={
+                        <form action={fixSign.bind(null, e.items.flatMap((f) => (f.action.kind === 'fix-sign' ? f.action.factIds : [])))}>
+                          <Button type="submit" size="sm">
+                            Corregir los {e.items.length} signos
+                          </Button>
+                        </form>
+                      }
+                    >
+                      {e.items.map((f) => (
+                        <FindingRow
+                          key={f.id}
+                          f={view(f)}
+                          excerpts={getExcerpts(ds, f.sourceCellIds, { max: 2 })}
+                          action={<FindingActions finding={f} mappings={ds.mappings} />}
+                        />
+                      ))}
+                    </FindingCluster>
+                  ),
+                )}
               </tbody>
             ))}
           </table>

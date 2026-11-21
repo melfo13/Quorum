@@ -6,7 +6,7 @@
 import { ACCOUNT, isOperating } from '@/lib/engine/catalog';
 import type { PipelineResult } from '@/lib/engine/pipeline';
 import type { Finding } from '@/lib/engine/types';
-import { monthName } from '@/lib/format';
+import { money, monthName } from '@/lib/format';
 
 export type CompanyValue = {
   id: string;
@@ -131,6 +131,8 @@ export function taskOf(f: Finding, c: CompanyValue, name: (id: string) => string
       return { title: `Asigna una cuenta del grupo en ${where ?? c.file}`, detail: `${f.actual}. ${f.impactText}.` };
     case 'SUBTOTAL_MISMATCH':
       return { title: `Corrige el subtotal de ${where ?? c.file}`, detail: `${f.actual}; ${lower(f.expected)}.` };
+    case 'IC_OUTSIDE':
+      return { title: `Indica a qué empresa del grupo corresponden las operaciones entre empresas de ${c.file}`, detail: `${f.actual}. ${f.impactText}.` };
     case 'KPI_MISMATCH':
       return { title: `Actualiza el indicador de ${where ?? c.file}`, detail: `${f.actual}; ${lower(f.expected)}.` };
     case 'IC_ASYMMETRIC':
@@ -145,4 +147,51 @@ export function taskOf(f: Finding, c: CompanyValue, name: (id: string) => string
     default:
       return { title: f.ruleId, detail: f.actual };
   }
+}
+
+export type Task = {
+  key: string;
+  title: string;
+  detail: string;
+  severity: Finding['severity'];
+  href: string;
+  /** How many findings this task covers (a sign error in twelve months is one task). */
+  count: number;
+};
+
+const ORDER: Finding['severity'][] = ['block', 'quarantine', 'warning'];
+
+/**
+ * The company's open findings as tasks for its manager, most urgent first. A sign error repeated in
+ * the months of one account is one task: one thing to fix in the file, not twelve.
+ */
+export function tasksOf(c: CompanyValue, name: (id: string) => string = (id) => id): Task[] {
+  const sorted = [...c.openFindings].sort((a, b) => ORDER.indexOf(a.severity) - ORDER.indexOf(b.severity));
+  const out: Task[] = [];
+  const signs = new Map<string, { task: Task; account: string; cents: number; words: string }>();
+  for (const f of sorted) {
+    const task: Task = { key: f.id, ...taskOf(f, c, name), severity: f.severity, href: `/load#${encodeURIComponent(f.id)}`, count: 1 };
+    if (f.ruleId !== 'SIGN_INVERTED') {
+      out.push(task);
+      continue;
+    }
+    // f.actual reads "<account>, <month>: <amount>".
+    const account = f.actual.split(',')[0];
+    const cents = Math.abs(f.groupImpact?.cents ?? 0);
+    const seen = signs.get(account);
+    if (seen) {
+      seen.task.count++;
+      seen.cents += cents;
+      continue;
+    }
+    signs.set(account, { task, account, cents, words: f.impactText.split(' en ')[0] });
+    out.push(task);
+  }
+  for (const g of signs.values()) {
+    const n = g.task.count;
+    if (n < 2) continue;
+    g.task.title = `Corrige el signo de ${g.account} en ${n} filas de ${c.file}`;
+    g.task.detail = `Tiene el signo al revés en ${n === 12 ? 'los 12 meses' : `${n} meses`}. ${g.words} en ${money(g.cents)}.`;
+  }
+  return out;
 }

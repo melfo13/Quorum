@@ -1,19 +1,8 @@
 import { fixSign, mapAccount, resolveFinding } from '@/app/actions';
 import { Button } from '@/components/ui/primitives';
+import { suggestAccount } from '@/lib/agent/proposals';
 import { ACCOUNTS } from '@/lib/engine/catalog';
 import type { Finding, SourceMapping } from '@/lib/engine/types';
-
-/** The group account a sibling local account maps to: the one sharing the longest code prefix. */
-function suggestAccount(mapping: SourceMapping | undefined, local: string): string | undefined {
-  if (!mapping) return undefined;
-  let best: { len: number; group: string } | undefined;
-  for (const [code, group] of Object.entries(mapping.accountMap)) {
-    let n = 0;
-    while (n < code.length && n < local.length && code[n] === local[n]) n++;
-    if (n > 0 && (!best || n > best.len)) best = { len: n, group };
-  }
-  return best?.group;
-}
 
 const STATEMENT = { PL: 'Estado de resultados', BS: 'Balance general' } as const;
 
@@ -59,7 +48,7 @@ export function FindingActions({ finding, mappings }: { finding: Finding; mappin
           id={selectId}
           name="group"
           defaultValue={suggested}
-          className="h-8 max-w-[200px] rounded-[6px] border border-control bg-surface px-2 text-ink"
+          className="h-8 max-w-[200px] rounded-[10px] border border-control bg-surface px-2 text-ink"
         >
           {(['PL', 'BS'] as const).map((st) => (
             <optgroup key={st} label={STATEMENT[st]}>

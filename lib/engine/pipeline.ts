@@ -273,6 +273,7 @@ export function runPipeline(ds: Dataset, res: Resolutions = NO_RESOLUTIONS): Pip
       DUPLICATE_ROW: `Una fila duplicada en ${co}`,
       SIGN_INVERTED: `Un signo invertido en ${co}`,
       ACCOUNT_UNMAPPED: `Una cuenta sin mapeo en ${co}`,
+      IC_OUTSIDE: `Ventas entre empresas de ${co} con contraparte fuera del grupo`,
     };
     return map[f.ruleId] ?? f.ruleId;
   };

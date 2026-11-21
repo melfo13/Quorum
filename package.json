@@ -10,9 +10,11 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "test": "vitest run",
-    "data": "tsx scripts/generate-data.ts"
+    "data": "tsx scripts/generate-data.ts",
+    "happy-path": "tsx scripts/happy-path.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "file:vendor/anthropic-sdk",
     "geist": "^1.5.1",
     "next": "^16.2.12",
     "react": "^19.2.8",
@@ -31,5 +33,15 @@
     "tsx": "^4.23.5",
     "typescript": "^5.9.3",
     "vitest": "^4.1.10"
+  },
+  "pnpm": {
+    "overrides": {
+      "standardwebhooks": "file:vendor/standardwebhooks",
+      "@stablelib/base64": "file:vendor/stablelib-base64",
+      "fast-sha256": "file:vendor/fast-sha256",
+      "json-schema-to-ts": "file:vendor/json-schema-to-ts",
+      "ts-algebra": "file:vendor/ts-algebra",
+      "@babel/runtime": "file:vendor/babel-runtime"
+    }
   }
 }

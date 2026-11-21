@@ -16,6 +16,7 @@ export function StatementTable({ pl, selected }: { pl: LineFigure[]; selected: s
             </th>
             <th scope="col" className="num">
               Suma de empresas
+              <span className="block text-[11px] font-normal">a tasa del grupo, sin filas fuera</span>
             </th>
             <th scope="col" className="num">
               Eliminaciones
@@ -55,7 +56,7 @@ export function StatementTable({ pl, selected }: { pl: LineFigure[]; selected: s
                     aria-current={active ? 'true' : undefined}
                     aria-label={`${line.label}, consolidado ${millions(f.consolidated)} millones. Abrir los registros que la forman.`}
                     className={cx(
-                      'inline-flex h-8 items-center rounded-[6px] border px-2 tabular-nums no-underline transition-colors',
+                      'inline-flex h-8 items-center rounded-[10px] border px-2 tabular-nums no-underline transition-colors',
                       active
                         ? 'border-ink bg-neu-bg'
                         : 'border-transparent underline decoration-dotted underline-offset-[3px] hover:border-control hover:bg-raised',

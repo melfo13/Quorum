@@ -23,6 +23,18 @@ export function fullyHeld(r: PipelineResult): Set<string> {
   return new Set([...total].filter(([id, n]) => n > 0 && held.get(id) === n).map(([id]) => id));
 }
 
+/**
+ * Companies that destroy value: their capital earns (ROIC) less than it costs (the group's WACC),
+ * lowest return first. A company whose whole file is held out has no figures to judge.
+ */
+export function valueDestroyers(r: PipelineResult): { id: string; name: string; roic: number }[] {
+  const held = fullyHeld(r);
+  return Object.entries(r.companyKpis)
+    .filter(([id, k]) => !held.has(id) && k.capital > 0 && k.roic < r.assumptions.wacc)
+    .sort((a, b) => a[1].roic - b[1].roic)
+    .map(([id, k]) => ({ id, name: r.companies.find((c) => c.id === id)?.name ?? id, roic: k.roic }));
+}
+
 /** Operating figures per (company, group account), GTQ cents, from the clean contributions. */
 function operating(r: PipelineResult) {
   const out = new Map<string, number>();
@@ -58,17 +70,15 @@ export function attentionItems(r: PipelineResult, prev: PipelineResult | null): 
 
   // b. Companies that destroy value.
   const wacc = r.assumptions.wacc;
-  const destroyers = Object.entries(r.companyKpis)
-    .filter(([id, k]) => !held.has(id) && k.capital > 0 && k.roic < wacc)
-    .sort((a, b) => a[1].roic - b[1].roic);
+  const destroyers = valueDestroyers(r);
   if (destroyers.length) {
-    const [id, k] = destroyers[0];
+    const { id, roic } = destroyers[0];
     const more = destroyers.length - 1;
     items.push({
       id: 'value',
       tone: 'warning',
       title: more ? `${name(id)} y ${more} más destruyen valor` : `${name(id)} destruye valor`,
-      detail: `rinde ${pct(k.roic)}; el capital cuesta ${pct(wacc)}`,
+      detail: `rinde ${pct(roic)}; el capital cuesta ${pct(wacc)}`,
       action: 'Ver empresa',
       href: `/companies?empresa=${id}`,
     });

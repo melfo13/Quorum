@@ -4,10 +4,21 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  standardwebhooks: file:vendor/standardwebhooks
+  '@stablelib/base64': file:vendor/stablelib-base64
+  fast-sha256: file:vendor/fast-sha256
+  json-schema-to-ts: file:vendor/json-schema-to-ts
+  ts-algebra: file:vendor/ts-algebra
+  '@babel/runtime': file:vendor/babel-runtime
+
 importers:
 
   .:
     dependencies:
+      '@anthropic-ai/sdk':
+        specifier: file:vendor/anthropic-sdk
+        version: file:vendor/anthropic-sdk(zod@4.5.4)
       geist:
         specifier: ^1.5.1
         version: 1.5.1(next@16.2.12(@babel/core@7.29.7)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))
@@ -64,6 +75,15 @@ packages:
     resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
     engines: {node: '>=10'}
 
+  '@anthropic-ai/sdk@file:vendor/anthropic-sdk':
+    resolution: {directory: vendor/anthropic-sdk, type: directory}
+    hasBin: true
+    peerDependencies:
+      zod: ^3.25.0 || ^4.0.0
+    peerDependenciesMeta:
+      zod:
+        optional: true
+
   '@babel/code-frame@7.29.7':
     resolution: {integrity: sha512-Aup7aUOfpbAUg2ROOJN6Iw5f9DMBlzu0mIkm/malLQFN/YQgO48wCj0Kxa3sEHJvPVFg7siR+qRInwXd2qhQKw==}
     engines: {node: '>=6.9.0'}
@@ -118,6 +138,10 @@ packages:
     resolution: {integrity: sha512-E8lTAYNB1KW+FH+VGJuZM1ioAx2E6oVlvQFRrf5P8ZZmsiJXYAD9vTFV7yyEURNzgh1dFqMZuO6tUwcARbqFCA==}
     engines: {node: '>=6.0.0'}
     hasBin: true
+
+  '@babel/runtime@file:vendor/babel-runtime':
+    resolution: {directory: vendor/babel-runtime, type: directory}
+    engines: {node: '>=6.9.0'}
 
   '@babel/template@7.29.7':
     resolution: {integrity: sha512-puq+Gf35oI24FeN11LkoUQFqv9uwNeWpxXZi/Ji3rRIoKAzKnxRaZ+Gkj0vKS9ZCiTESfng1N9LyOyXvo+m+Gg==}
@@ -670,6 +694,9 @@ packages:
 
   '@rtsao/scc@1.1.0':
     resolution: {integrity: sha512-zt6OdqaDoOnJ1ZYsCYGt9YmWzDXl4vQdKTyJev62gFhRGKdx7mcT54V9KIjg+d2wi9EXsPvAPKe7i7WjfVWB8g==}
+
+  '@stablelib/base64@file:vendor/stablelib-base64':
+    resolution: {directory: vendor/stablelib-base64, type: directory}
 
   '@standard-schema/spec@1.1.0':
     resolution: {integrity: sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==}
@@ -1383,6 +1410,9 @@ packages:
   fast-levenshtein@2.0.6:
     resolution: {integrity: sha512-DCXu6Ifhqcks7TZKY3Hxp3y6qphY5SJZmrWMDrKcERSOXWQdMhU9Ig/PYrzyw/ul9jOIyh0N4M0tbC5hodg8dw==}
 
+  fast-sha256@file:vendor/fast-sha256:
+    resolution: {directory: vendor/fast-sha256, type: directory}
+
   fastq@1.20.1:
     resolution: {integrity: sha512-GGToxJ/w1x32s/D2EKND7kTil4n8OVk/9mycTc4VDza13lOvpUZTGX3mFSCtV9ksdGBVzvsyAVLM6mHFThxXxw==}
 
@@ -1660,6 +1690,10 @@ packages:
 
   json-buffer@3.0.1:
     resolution: {integrity: sha512-4bV5BfR2mqfQTJm+V5tPPdf+ZpuhiIvTuAB5g8kcrXOZpTT/QwwVRWBywX1ozr6lEuPdbHxwaJlm9G6mI2sfSQ==}
+
+  json-schema-to-ts@file:vendor/json-schema-to-ts:
+    resolution: {directory: vendor/json-schema-to-ts, type: directory}
+    engines: {node: '>=16'}
 
   json-schema-traverse@0.4.1:
     resolution: {integrity: sha512-xbbCH5dCYU5T8LcEhhuh7HJ88HXuW3qsI3Y0zOZFKfZEHcpWiHU/Jxzk629Brsab/mMiHQti9wMP+845RPe3Vg==}
@@ -2140,6 +2174,9 @@ packages:
   stackback@0.0.2:
     resolution: {integrity: sha512-1XMJE5fQo1jGH6Y/7ebnwPOBEkIEnT4QF32d5R1+VXdXveM0IBMJt8zfaxX1P3QhVwrYe+576+jkANtSS2mBbw==}
 
+  standardwebhooks@file:vendor/standardwebhooks:
+    resolution: {directory: vendor/standardwebhooks, type: directory}
+
   std-env@4.2.0:
     resolution: {integrity: sha512-oCUKSupKTHX53EyjDtuZQ64pjLJ6yYCtpmEw0goYxtjG9KpbRe8KAsl2tBUGU9DyMcJ0RwJ8GqJAFzMXcXW1Rw==}
 
@@ -2216,6 +2253,9 @@ packages:
   to-regex-range@5.0.1:
     resolution: {integrity: sha512-65P7iz6X5yEr1cwcgvQxbbIw7Uk3gOy5dIdtZ4rDveLqhrdJP+Li/Hx6tyK0NEb+2GCyneCMJiGqrADCSNk8sQ==}
     engines: {node: '>=8.0'}
+
+  ts-algebra@file:vendor/ts-algebra:
+    resolution: {directory: vendor/ts-algebra, type: directory}
 
   ts-api-utils@2.5.0:
     resolution: {integrity: sha512-OJ/ibxhPlqrMM0UiNHJ/0CKQkoKF243/AEmplt3qpRgkW8VG7IfOS41h7V8TjITqdByHzrjcS/2si+y4lIh8NA==}
@@ -2419,6 +2459,13 @@ snapshots:
 
   '@alloc/quick-lru@5.2.0': {}
 
+  '@anthropic-ai/sdk@file:vendor/anthropic-sdk(zod@4.5.4)':
+    dependencies:
+      json-schema-to-ts: file:vendor/json-schema-to-ts
+      standardwebhooks: file:vendor/standardwebhooks
+    optionalDependencies:
+      zod: 4.5.4
+
   '@babel/code-frame@7.29.7':
     dependencies:
       '@babel/helper-validator-identifier': 7.29.7
@@ -2495,6 +2542,8 @@ snapshots:
   '@babel/parser@7.29.8':
     dependencies:
       '@babel/types': 7.29.8
+
+  '@babel/runtime@file:vendor/babel-runtime': {}
 
   '@babel/template@7.29.7':
     dependencies:
@@ -2878,6 +2927,8 @@ snapshots:
   '@rolldown/pluginutils@1.0.1': {}
 
   '@rtsao/scc@1.1.0': {}
+
+  '@stablelib/base64@file:vendor/stablelib-base64': {}
 
   '@standard-schema/spec@1.1.0': {}
 
@@ -3776,6 +3827,8 @@ snapshots:
 
   fast-levenshtein@2.0.6: {}
 
+  fast-sha256@file:vendor/fast-sha256: {}
+
   fastq@1.20.1:
     dependencies:
       reusify: 1.1.0
@@ -4056,6 +4109,11 @@ snapshots:
   jsesc@3.1.0: {}
 
   json-buffer@3.0.1: {}
+
+  json-schema-to-ts@file:vendor/json-schema-to-ts:
+    dependencies:
+      '@babel/runtime': file:vendor/babel-runtime
+      ts-algebra: file:vendor/ts-algebra
 
   json-schema-traverse@0.4.1: {}
 
@@ -4560,6 +4618,11 @@ snapshots:
 
   stackback@0.0.2: {}
 
+  standardwebhooks@file:vendor/standardwebhooks:
+    dependencies:
+      '@stablelib/base64': file:vendor/stablelib-base64
+      fast-sha256: file:vendor/fast-sha256
+
   std-env@4.2.0: {}
 
   stop-iteration-iterator@1.1.0:
@@ -4647,6 +4710,8 @@ snapshots:
   to-regex-range@5.0.1:
     dependencies:
       is-number: 7.0.0
+
+  ts-algebra@file:vendor/ts-algebra: {}
 
   ts-api-utils@2.5.0(typescript@5.9.3):
     dependencies:

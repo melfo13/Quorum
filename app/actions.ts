@@ -2,7 +2,16 @@
 
 import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
-import { COOKIE, DATASET_COOKIE, SAMPLE_ID, encodeResolutions, parseResolutions } from '@/lib/server/state';
+import { applyToResolutions } from '@/lib/agent/proposals';
+import {
+  COOKIE,
+  DATASET_COOKIE,
+  SAMPLE_ID,
+  encodeResolutions,
+  getDataset,
+  getResult,
+  parseResolutions,
+} from '@/lib/server/state';
 import type { Resolutions } from '@/lib/engine/types';
 
 async function update(change: (r: Resolutions) => Resolutions) {
@@ -31,6 +40,23 @@ export async function mapAccount(companyId: string, localAccount: string, groupA
       [companyId]: { ...(r.accountOverrides[companyId] ?? {}), [localAccount]: groupAccount },
     },
   }));
+}
+
+/**
+ * Apply a correction the agent proposed. It is checked again here against the current data, so a
+ * stale or invented proposal changes nothing, and it records exactly what the finding's own button does.
+ */
+export async function applyProposal(
+  findingId: string,
+  groupAccount?: string,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const ctx = { r: await getResult(), mappings: getDataset().mappings };
+  try {
+    await update((r) => applyToResolutions(ctx, r, findingId, groupAccount));
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : 'No se pudo aplicar.' };
+  }
 }
 
 export async function approveMapping(companyId: string) {

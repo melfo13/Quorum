@@ -140,6 +140,7 @@ export function mapWorkbook(
       localName,
       groupAccount: acc ? group : null,
       counterpartyId: cp ? (mapping.counterpartyMap[cp] ?? null) : null,
+      ...(cp ? { counterpartyRaw: cp } : {}),
       currency,
       amountLocal: Math.round((flip ? -scaled : scaled) * 100) / 100,
       amountAsTyped: Math.round(scaled * 100) / 100,

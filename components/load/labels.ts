@@ -12,6 +12,7 @@ export const RULE_NAMES: Record<RuleId, string> = {
   ACCOUNT_UNMAPPED: 'Cuenta sin mapeo',
   IC_ASYMMETRIC: 'Venta entre empresas no cuadra',
   IC_MISSING: 'Venta entre empresas sin contraparte',
+  IC_OUTSIDE: 'Contraparte fuera del grupo',
   KPI_MISMATCH: 'Indicador copiado no coincide',
 };
 
@@ -32,6 +33,7 @@ export function effectParts(f: Finding): { figure: string; words: string } {
   const capital = (s: string) => {
     const t = s
       .replace(/\s+/g, ' ')
+      .replace(/\s+([;,.])/g, '$1')
       .replace(/\s+(?:by|en|de)\s*$/, '')
       .replace(/^[\s,.:]+|[\s,]+$/g, '')
       .trim();

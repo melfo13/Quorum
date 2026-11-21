@@ -4,20 +4,82 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useRef, useState, type DragEvent } from 'react';
 import { Button, Pill, buttonClass, cx, type Tone } from '@/components/ui/primitives';
-
-type Status = 'reconocido' | 'supuestos' | 'sin mapeo' | 'no se pudo leer';
-type Result = {
-  files: { name: string; status: Status; company?: string }[];
-  missing: { file: string; company: string }[];
-  recognised: number;
-};
+import type { UploadResult as Result, UploadStatus as Status } from '@/lib/server/upload';
 
 const STATUS: Record<Status, { tone: Tone; text: string }> = {
   reconocido: { tone: 'positive', text: 'Reconocido' },
   supuestos: { tone: 'positive', text: 'Supuestos del grupo' },
-  'sin mapeo': { tone: 'warning', text: 'Nombre no reconocido' },
+  'elegir empresa': { tone: 'warning', text: 'Elige la empresa' },
+  'formato distinto': { tone: 'negative', text: 'Formato distinto' },
+  repetido: { tone: 'warning', text: 'Repetido' },
   'no se pudo leer': { tone: 'negative', text: 'No se pudo leer' },
 };
+
+/** Which company each pending file is: one select per file, a company can be picked only once. */
+function AssignPending({ result, onDone }: { result: Result; onDone: (r: Result) => void }) {
+  const [choice, setChoice] = useState<Record<string, string>>({});
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const picked = new Set(Object.values(choice).filter(Boolean));
+
+  const assign = async () => {
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/upload/assign', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ id: result.id, assignments: choice }),
+      });
+      const json = await res.json();
+      if (!res.ok) setError(json.error ?? 'No se pudieron asignar las empresas.');
+      else onDone(json as Result);
+    } catch {
+      setError('No se pudo conectar con la app.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-3 rounded-[16px] border border-warn-border bg-warn-bg/40 p-4">
+      <div className="flex flex-col gap-1">
+        <h3 className="m-0 text-base font-semibold">¿De qué empresa es cada archivo?</h3>
+        <p className="m-0 text-sm text-muted">
+          Estos archivos tienen la estructura de un presupuesto del grupo, pero su nombre no dice de qué empresa son.
+        </p>
+      </div>
+      <ul className="m-0 flex list-none flex-col gap-2 p-0">
+        {result.pending.map((p) => (
+          <li key={p.name} className="flex flex-wrap items-center justify-between gap-2">
+            <label htmlFor={`assign-${p.name}`} className="min-w-0 truncate font-mono text-xs">
+              {p.name}
+            </label>
+            <select
+              id={`assign-${p.name}`}
+              value={choice[p.name] ?? ''}
+              onChange={(e) => setChoice((c) => ({ ...c, [p.name]: e.target.value }))}
+              className="h-8 rounded-[10px] border border-control bg-surface px-2 text-ink"
+            >
+              <option value="">Elegir empresa…</option>
+              {p.companies.map((c) => (
+                <option key={c.id} value={c.id} disabled={picked.has(c.id) && choice[p.name] !== c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </li>
+        ))}
+      </ul>
+      <div className="flex flex-wrap items-center gap-3">
+        <Button variant="primary" onClick={assign} disabled={busy || picked.size === 0}>
+          {busy ? 'Asignando…' : 'Asignar empresas'}
+        </Button>
+        {error && <span className="text-sm text-negative">{error}</span>}
+      </div>
+    </div>
+  );
+}
 
 const ACCEPT = /\.(xlsx|csv)$/i;
 const kb = (n: number) => (n >= 1024 * 1024 ? `${(n / 1024 / 1024).toFixed(1)} MB` : `${Math.max(1, Math.round(n / 1024))} KB`);
@@ -85,7 +147,7 @@ export function Uploader() {
         onDragLeave={() => setOver(false)}
         onDrop={onDrop}
         className={cx(
-          'flex min-h-[148px] flex-1 cursor-pointer flex-col items-center justify-center gap-1 rounded-[8px] border border-dashed px-6 py-8 text-center transition-colors focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-accent',
+          'flex min-h-[148px] flex-1 cursor-pointer flex-col items-center justify-center gap-1 rounded-[16px] border border-dashed px-6 py-8 text-center transition-colors focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-accent',
           over ? 'border-accent bg-accent-tint' : 'border-control bg-raised hover:border-[#9aa0a6]',
         )}
       >
@@ -135,7 +197,7 @@ export function Uploader() {
       </div>
 
       {error && (
-        <p role="alert" className="m-0 rounded-[6px] bg-neg-bg px-3 py-2 text-sm text-neg-ink">
+        <p role="alert" className="m-0 rounded-[10px] bg-neg-bg px-3 py-2 text-sm text-neg-ink">
           {error}
         </p>
       )}
@@ -165,13 +227,27 @@ export function Uploader() {
                     </th>
                     <td>{f.company ?? <span className="text-muted">—</span>}</td>
                     <td>
-                      <Pill tone={STATUS[f.status].tone}>{STATUS[f.status].text}</Pill>
+                      <div className="flex flex-col items-start gap-1">
+                        <Pill tone={STATUS[f.status].tone}>{STATUS[f.status].text}</Pill>
+                        {f.detail && <span className="text-xs text-muted">{f.detail}</span>}
+                      </div>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+          {result.pending.length > 0 && (
+            <AssignPending
+              result={result}
+              onDone={(next) => {
+                // Keep every row; the assigned files take their new status.
+                const updated = new Map(next.files.map((f) => [f.name, f]));
+                setResult({ ...next, files: result.files.map((f) => updated.get(f.name) ?? f) });
+                router.refresh();
+              }}
+            />
+          )}
           {result.missing.length > 0 && (
             <p className="m-0 text-sm text-muted">
               Faltan: {result.missing.map((m) => `${m.file} (${m.company})`).join(', ')}. La carga mostrará esas empresas como
@@ -184,10 +260,10 @@ export function Uploader() {
                 Ver la carga
               </Link>
             </div>
-          ) : (
+          ) : result.pending.length ? null : (
             <p className="m-0 text-sm text-muted">
-              Ningún archivo se reconoció, así que la app sigue con los datos anteriores. Revisa que sean los presupuestos de
-              las empresas del grupo, con su nombre original, y vuelve a enviarlos.
+              Ningún archivo se reconoció, así que la app sigue con los datos anteriores. Cada presupuesto necesita la hoja y
+              las columnas que indica su estado; revisa los archivos marcados como formato distinto y vuelve a enviarlos.
             </p>
           )}
         </div>

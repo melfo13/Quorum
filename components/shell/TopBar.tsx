@@ -1,8 +1,9 @@
 import Link from 'next/link';
+import { AgentToggle } from '@/components/agent/AgentSidebar';
 import { NavLinks } from './NavLinks';
 
 /** Six short bars that converge into one: six companies, one group number. Drawn in ink. */
-function Mark() {
+export function Mark() {
   return (
     <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true" className="flex-none">
       {[0, 1, 2, 3, 4, 5].map((i) => (
@@ -26,24 +27,27 @@ export function TopBar({
   uploaded?: boolean;
 }) {
   return (
-    <header className="border-b border-border bg-surface">
+    <header className="@container sticky top-0 z-30 border-b border-white/70 bg-glass backdrop-blur-xl">
       <div className="flex min-h-12 flex-wrap items-center gap-x-8 px-4 sm:flex-nowrap sm:px-9">
-        <Link href="/load" className="flex items-center gap-2 text-base font-semibold no-underline">
+        <Link href="/summary" className="flex items-center gap-2 font-[family-name:var(--font-display)] text-lg font-semibold text-[var(--accent)] no-underline md:hidden">
           <Mark />
-          PulseGroup
+          Quórum
         </Link>
         <NavLinks counts={{ load: openBlocks }} />
-        <div className="hidden items-center gap-3 py-2 text-muted md:flex">
+        <div className="hidden flex-none items-center gap-3 whitespace-nowrap py-2 text-muted @5xl:flex md:!hidden">
           {uploaded ? (
-            <span className="rounded-full bg-neu-bg px-2 py-0.5 text-xs font-medium text-ink">Archivos subidos</span>
+            <span className="rounded-full bg-chip-blue px-2 py-0.5 text-xs font-medium text-ink">Archivos subidos</span>
           ) : practice ? (
-            <span className="rounded-full bg-warn-bg px-2 py-0.5 text-xs font-medium text-warn-ink ring-1 ring-inset ring-warn-border">
+            <span className="rounded-full bg-chip-yellow px-2 py-0.5 text-xs font-medium text-ink">
               Datos de ejemplo
             </span>
           ) : (
             <span className="rounded-full bg-neu-bg px-2 py-0.5 text-xs font-medium text-muted">Sin datos</span>
           )}
           <span>{scope}</span>
+        </div>
+        <div className="ml-auto flex items-center">
+          <AgentToggle />
         </div>
       </div>
     </header>

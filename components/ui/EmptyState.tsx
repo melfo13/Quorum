@@ -11,7 +11,7 @@ export function EmptyState({ title, question }: { title: string; question: strin
       <TitleRow title={title} sub={question} />
       <section
         aria-label="Sin datos"
-        className="flex flex-col items-start gap-4 rounded-[8px] border border-dashed border-control bg-surface px-6 py-10 sm:px-10"
+        className="flex flex-col items-start gap-4 rounded-[16px] border border-dashed border-control bg-surface px-6 py-10 sm:px-10"
       >
         <h2 className="m-0 text-lg font-semibold">Todavía no hay presupuestos cargados</h2>
         <p className="m-0 max-w-[620px] text-muted">

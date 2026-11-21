@@ -33,7 +33,7 @@ const ADJ: Record<Adjustment['type'], string> = {
 
 export async function GET() {
   if ((await getSource()).kind === 'none')
-    return new Response('No hay presupuestos cargados. Sube los archivos en Carga.', { status: 404 });
+    return new Response('No hay presupuestos cargados. Sube los archivos en Configuración.', { status: 404 });
 
   const r = await getResult();
   const fy = r.fiscalYear;
@@ -99,7 +99,7 @@ export async function GET() {
 
   const companies = r.companies.map((c) => c.id);
   const statement: CellValue[][] = [
-    [`PulseGroup · Estado de resultados consolidado ${fy} · ${ccy}`],
+    [`Quórum · Estado de resultados consolidado ${fy} · ${ccy}`],
     ['Línea', 'Suma de empresas', 'Eliminaciones', 'Consolidado', ...companies.map(companyName)],
     ...PL_LINES.map((line) => {
       const fig = r.pl.find((l) => l.id === line.id)!;
@@ -114,7 +114,7 @@ export async function GET() {
   ];
 
   const rastro: CellValue[][] = [
-    [`PulseGroup · Rastro de cada cifra hasta su celda de origen · ${ccy}. Cada cifra consolidada = suma de esta hoja + Eliminaciones.`],
+    [`Quórum · Rastro de cada cifra hasta su celda de origen · ${ccy}. Cada cifra consolidada = suma de esta hoja + Eliminaciones.`],
     [
       'Cuenta del grupo',
       'Línea',
@@ -139,7 +139,7 @@ export async function GET() {
     return m ? `${companyName(m.sellerId)} → ${companyName(m.buyerId)}` : '';
   };
   const eliminaciones: CellValue[][] = [
-    [`PulseGroup · Eliminaciones entre empresas · ${ccy}`],
+    [`Quórum · Eliminaciones entre empresas · ${ccy}`],
     ['Tipo', 'Cuenta del grupo', 'Periodo', ccy, 'Motivo', 'Par'],
     ...[...r.adjustments]
       .sort((a, b) => a.groupAccount.localeCompare(b.groupAccount) || a.period.localeCompare(b.period))
@@ -154,7 +154,7 @@ export async function GET() {
   ];
 
   const hallazgos: CellValue[][] = [
-    ['PulseGroup · Hallazgos del validador'],
+    ['Quórum · Hallazgos del validador'],
     ['Regla', 'Severidad', 'Estado', 'Empresa', 'Dónde', 'Esperado', 'Encontrado', 'Efecto en el grupo', 'Resolución'],
     ...r.findings.map((f) => {
       const p = f.places[0];
@@ -174,7 +174,7 @@ export async function GET() {
   ];
 
   const supuestos: CellValue[][] = [
-    ['PulseGroup · Supuestos del grupo'],
+    ['Quórum · Supuestos del grupo'],
     ['Parámetro', 'Valor'],
     ['Moneda del grupo', ccy],
     ['WACC', r.assumptions.wacc],
@@ -196,7 +196,7 @@ export async function GET() {
   return new Response(new Uint8Array(buf), {
     headers: {
       'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      'Content-Disposition': `attachment; filename="pulsegroup-consolidado-${fy}.xlsx"`,
+      'Content-Disposition': `attachment; filename="quorum-consolidado-${fy}.xlsx"`,
       'Cache-Control': 'no-store',
     },
   });

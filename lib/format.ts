@@ -8,6 +8,20 @@ const n2 = nf(2);
 
 export const CURRENCY_SIGN: Record<string, string> = { GTQ: 'Q', USD: 'USD', MXN: 'MXN', EUR: 'EUR' };
 
+/** Currency names for sentences ("el quetzal se debilita frente al colón"). Unknown codes show as the code. */
+export const CURRENCY_NAME: Record<string, string> = {
+  GTQ: 'quetzal',
+  CRC: 'colón',
+  USD: 'dólar',
+  MXN: 'peso mexicano',
+  EUR: 'euro',
+  HNL: 'lempira',
+  NIO: 'córdoba',
+  PAB: 'balboa',
+  DOP: 'peso dominicano',
+};
+export const currencyName = (code: string) => CURRENCY_NAME[code] ?? code;
+
 /** "Q 12.3 M", "Q 15,000", "−Q 0.4 M". Cents in, group currency. */
 export function money(cents: number, opts: { currency?: string; compact?: boolean; sign?: boolean } = {}) {
   const { currency = 'GTQ', compact = true, sign = false } = opts;

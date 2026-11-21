@@ -21,7 +21,7 @@ export function SourceExcerpt({ excerpt, maxColumns = 8, className }: { excerpt:
 
   return (
     <figure className={cx('m-0 flex min-w-0 flex-col gap-1.5', className)}>
-      <div className="overflow-x-auto rounded-[6px] border border-border">
+      <div className="overflow-x-auto rounded-[10px] border border-border">
         <table className="w-full border-collapse text-xs" aria-label={`Origen: ${excerpt.origin}`}>
           <thead>
             <tr className="bg-raised">
@@ -67,7 +67,7 @@ export function SourceExcerpt({ excerpt, maxColumns = 8, className }: { excerpt:
                         'max-w-[160px] truncate border-r border-rule px-2 py-1.5 last:border-r-0',
                         numeric && 'text-right tabular-nums',
                         gaps.has(c.i) && 'border-l-2 border-l-control',
-                        hit && 'bg-accent-tint font-semibold text-ink outline-2 -outline-offset-2 outline-accent',
+                        hit && 'pg-cell-pulse bg-accent-tint font-semibold text-ink outline-2 -outline-offset-2 outline-accent',
                       )}
                     >
                       {v || <span className="text-faint">·</span>}
