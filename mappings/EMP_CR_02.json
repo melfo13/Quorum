@@ -1,0 +1,57 @@
+{
+  "companyId": "EMP_CR_02",
+  "companyName": "EMP_CR_02",
+  "file": "EMP_CR_02_presupuesto.xlsx",
+  "currency": "CRC",
+  "scale": 1,
+  "expenseSign": "negative",
+  "sheets": [
+    {
+      "sheet": "Presupuesto",
+      "headerRow": 1,
+      "shape": "long",
+      "columns": {
+        "account": "Cuenta",
+        "description": "Descripción",
+        "period": "Mes",
+        "amount": "Monto",
+        "counterparty": "Contraparte",
+        "currency": "Moneda"
+      }
+    }
+  ],
+  "counterpartyMap": {
+    "Empresa 3": "E3",
+    "Empresa 4": "E4"
+  },
+  "accountMap": {
+    "1101": "1100",
+    "1201": "1200",
+    "1251": "1250",
+    "1301": "1300",
+    "1501": "1500",
+    "2101": "2100",
+    "2151": "2150",
+    "2201": "2200",
+    "2301": "2300",
+    "2501": "2500",
+    "3101": "3100",
+    "3201": "3200",
+    "3301": "3300",
+    "4101": "4000",
+    "4102": "4000",
+    "4190": "4100",
+    "5101": "5000",
+    "5190": "5100",
+    "6101": "6100",
+    "6201": "6200",
+    "6301": "6300",
+    "6401": "6400",
+    "6501": "6500",
+    "6502": "6500",
+    "6901": "6900",
+    "7101": "7100",
+    "8101": "8100"
+  },
+  "status": "proposed"
+}

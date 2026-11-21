@@ -2,7 +2,7 @@
   "companyId": "E1",
   "companyName": "Empresa 1",
   "file": "e1_presupuesto.xlsx",
-  "currency": "GTQ",
+  "currency": "CRC",
   "scale": 1,
   "expenseSign": "negative",
   "sheets": [
