@@ -20,10 +20,7 @@
       }
     }
   ],
-  "counterpartyMap": {
-    "Empresa 3": "E3",
-    "Empresa 4": "E4"
-  },
+  "counterpartyMap": {},
   "accountMap": {
     "1101": "1100",
     "1201": "1200",

@@ -1,7 +1,7 @@
 /**
  * POST /api/upload — the visitor's own budget files.
  *
- * Files are recognised by name against the mappings (e1_presupuesto.xlsx → Empresa 1) plus
+ * Files are recognised by name against the mappings (EMP_CR_01_presupuesto.xlsx → EMP_CR_01) plus
  * supuestos.xlsx. Recognised files are written to data/uploads/<id>/ under their canonical name,
  * the pg_dataset cookie selects that folder, and the decisions cookie is cleared: a new upload
  * starts with no decisions.

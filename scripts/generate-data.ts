@@ -1,7 +1,7 @@
 /**
  * Practice dataset for PulseGroup (docs/seed.md). Fixed seed, reproducible.
  *
- *   pnpm data          writes data/, data/anterior/ and data/_truth/
+ *   pnpm data          writes data/<company>/, data/anterior/<company>/ and data/_truth/clean/<company>/
  *
  * Deviation from the seed: SheetJS is not installable on the event network (TLS interception),
  * so .xlsx files are written with lib/engine/workbook.ts. The files open in Excel and Numbers.
@@ -1098,9 +1098,17 @@ function cloneFile(f: FileOut): FileOut {
   return { ...f, sheets: f.sheets.map((s) => ({ name: s.name, grid: s.grid.map((r) => [...r]) })) };
 }
 
+/** `e1_presupuesto.xlsx` is written to `E1/`, next to the other companies. */
+function companyFolder(file: string): string | null {
+  const m = /^e(\d)_/i.exec(file);
+  return m ? `E${m[1]}` : null;
+}
+
 function writeFile(dir: string, f: FileOut) {
-  mkdirSync(dir, { recursive: true });
-  const p = path.join(dir, f.file);
+  const folder = companyFolder(f.file);
+  const dest = folder ? path.join(dir, folder) : dir;
+  mkdirSync(dest, { recursive: true });
+  const p = path.join(dest, f.file);
   if (f.file.endsWith('.csv')) writeFileSync(p, writeCsv(f.sheets[0].grid, f.csvDelimiter ?? ','));
   else writeFileSync(p, writeXlsx(f.sheets.map((s) => ({ name: s.name, rows: s.grid }))));
 }
@@ -1244,18 +1252,18 @@ propia plantilla, así que los archivos no se parecen entre sí. La moneda del g
 
 | Archivo | Empresa | Moneda | Notas de quien lo envió |
 | --- | --- | --- | --- |
-| e1_presupuesto.xlsx | Empresa 1 | GTQ | Una fila por cuenta y mes. |
-| e2_presupuesto.xlsx | Empresa 2 | GTQ | Incluye subtotales por bloque. Gastos en positivo. |
-| e3_budget.csv | Empresa 3 | USD | Un mes por columna. Total anual al final. |
-| e4_budget.csv | Empresa 4 | USD | Exportado desde su ERP: punto y coma, coma decimal, miles. |
-| e5_presupuesto.xlsx | Empresa 5 | MXN | Montos en miles. Trae su propia hoja de tasas. |
-| e6_presupuesto.xlsx | Empresa 6 | MXN | Una hoja por área, más el balance y una hoja de indicadores. |
+| E1/e1_presupuesto.xlsx | Empresa 1 | GTQ | Una fila por cuenta y mes. |
+| E2/e2_presupuesto.xlsx | Empresa 2 | GTQ | Incluye subtotales por bloque. Gastos en positivo. |
+| E3/e3_budget.csv | Empresa 3 | USD | Un mes por columna. Total anual al final. |
+| E4/e4_budget.csv | Empresa 4 | USD | Exportado desde su ERP: punto y coma, coma decimal, miles. |
+| E5/e5_presupuesto.xlsx | Empresa 5 | MXN | Montos en miles. Trae su propia hoja de tasas. |
+| E6/e6_presupuesto.xlsx | Empresa 6 | MXN | Una hoja por área, más el balance y una hoja de indicadores. |
 | supuestos.xlsx | Grupo | | Tasas de cambio promedio y de cierre por mes, WACC y tasa impositiva. |
 
 Cada archivo trae estado de resultados y balance mensual. Las operaciones entre empresas del grupo
 se identifican por la columna de contraparte de cada archivo.
 
-\`anterior/\` contiene la versión previa del mismo presupuesto, con la misma estructura.
+Cada empresa tiene su carpeta. \`anterior/\` contiene la versión previa, con las mismas carpetas.
 `;
 
 main();

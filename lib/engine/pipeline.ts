@@ -30,11 +30,37 @@ export type Dataset = {
 
 const cache = new Map<string, { stamp: string; ds: Dataset }>();
 
+/** Dataset roots that are not a company's folder. Their files belong to another load. */
+const NOT_A_COMPANY = new Set(['uploads', '_truth', 'anterior']);
+
+/** Spreadsheets and mappings in a dataset: top-level files, plus one folder per company. */
+function datasetFiles(dir: string): string[] {
+  if (!existsSync(dir)) return [];
+  const out: string[] = [];
+  for (const name of readdirSync(dir)) {
+    if (name.startsWith('.') || NOT_A_COMPANY.has(name)) continue;
+    const p = path.join(dir, name);
+    if (statSync(p).isDirectory()) {
+      for (const child of readdirSync(p)) if (/\.(xlsx|csv|json)$/i.test(child)) out.push(path.join(p, child));
+    } else if (/\.(xlsx|csv|json)$/i.test(name)) out.push(p);
+  }
+  return out;
+}
+
 function stampOf(dir: string, mappingsDir: string) {
-  const files = [dir, mappingsDir].flatMap((d) =>
-    existsSync(d) ? readdirSync(d).filter((f) => /\.(xlsx|csv|json)$/i.test(f)).map((f) => path.join(d, f)) : [],
-  );
-  return files.map((f) => `${f}:${statSync(f).mtimeMs}`).join('|');
+  return [...datasetFiles(dir), ...datasetFiles(mappingsDir)].map((f) => `${f}:${statSync(f).mtimeMs}`).join('|');
+}
+
+/**
+ * A company file lives in `<dir>/<companyId>/<file>`. A flat `<dir>/<file>` still loads, so an
+ * upload that was saved under its canonical name keeps working.
+ */
+function companyFile(dir: string, companyId: string, file: string): string | null {
+  const nested = path.join(dir, companyId, file);
+  if (existsSync(nested)) return nested;
+  const flat = path.join(dir, file);
+  if (existsSync(flat)) return flat;
+  return null;
 }
 
 export function loadDataset(dir: string, mappingsDir: string, supuestos = path.join(dir, 'supuestos.xlsx')): Dataset {
@@ -52,8 +78,8 @@ export function loadDataset(dir: string, mappingsDir: string, supuestos = path.j
   const workbooks = new Map<string, Workbook>();
   const missingFiles: string[] = [];
   for (const m of mappings) {
-    const p = path.join(dir, m.file);
-    if (!existsSync(p)) {
+    const p = companyFile(dir, m.companyId, m.file);
+    if (!p) {
       missingFiles.push(m.file);
       continue;
     }

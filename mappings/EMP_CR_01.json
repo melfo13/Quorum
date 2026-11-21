@@ -1,7 +1,7 @@
 {
-  "companyId": "E1",
-  "companyName": "Empresa 1",
-  "file": "e1_presupuesto.xlsx",
+  "companyId": "EMP_CR_01",
+  "companyName": "EMP_CR_01",
+  "file": "EMP_CR_01_presupuesto.xlsx",
   "currency": "CRC",
   "scale": 1,
   "expenseSign": "negative",
@@ -20,10 +20,7 @@
       }
     }
   ],
-  "counterpartyMap": {
-    "Empresa 3": "E3",
-    "Empresa 4": "E4"
-  },
+  "counterpartyMap": {},
   "accountMap": {
     "1101": "1100",
     "1201": "1200",

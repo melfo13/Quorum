@@ -1,19 +1,15 @@
-# Datos del reto: presupuesto 2027 del grupo
+# Presupuesto 2027
 
-Seis empresas del grupo enviaron su presupuesto anual. Cada una usa su propio plan de cuentas y su
-propia plantilla, así que los archivos no se parecen entre sí. La moneda del grupo es el quetzal (GTQ).
+Cada empresa oficial tiene su carpeta. Ahí viven su presupuesto y su archivo de WACC. `supuestos.xlsx` se queda en la raíz: es del grupo. La moneda del grupo es el quetzal (GTQ).
 
-| Archivo | Empresa | Moneda | Notas de quien lo envió |
-| --- | --- | --- | --- |
-| e1_presupuesto.xlsx | Empresa 1 | GTQ | Una fila por cuenta y mes. |
-| e2_presupuesto.xlsx | Empresa 2 | GTQ | Incluye subtotales por bloque. Gastos en positivo. |
-| e3_budget.csv | Empresa 3 | USD | Un mes por columna. Total anual al final. |
-| e4_budget.csv | Empresa 4 | USD | Exportado desde su ERP: punto y coma, coma decimal, miles. |
-| e5_presupuesto.xlsx | Empresa 5 | MXN | Montos en miles. Trae su propia hoja de tasas. |
-| e6_presupuesto.xlsx | Empresa 6 | MXN | Una hoja por área, más el balance y una hoja de indicadores. |
-| supuestos.xlsx | Grupo | | Tasas de cambio promedio y de cierre por mes, WACC y tasa impositiva. |
+| Carpeta | Archivos | Moneda del presupuesto |
+| --- | --- | --- |
+| `EMP_CR_01/` | `EMP_CR_01_presupuesto.xlsx`, `EMP_CR_01.csv` | CRC |
+| `EMP_CR_02/` | `EMP_CR_02_presupuesto.xlsx`, `EMP_CR_02.csv` | CRC |
+| `EMP_CR_03/` | `EMP_CR_03_presupuesto.xlsx`, `EMP_CR_03.csv` | CRC |
+| `EMP_GT_01/` | `EMP_GT_01_presupuesto.xlsx`, `EMP_GT_01.csv` | GTQ |
+| `EMP_GT_02/` | `EMP_GT_02_presupuesto.xlsx`, `EMP_GT_02.csv` | GTQ |
+| `EMP_GT_03/` | `EMP_GT_03_presupuesto.xlsx`, `EMP_GT_03.csv` | GTQ |
+| | `supuestos.xlsx` | Tasas de cambio, WACC y tasa impositiva del grupo. |
 
-Cada archivo trae estado de resultados y balance mensual. Las operaciones entre empresas del grupo
-se identifican por la columna de contraparte de cada archivo.
-
-`anterior/` contiene la versión previa del mismo presupuesto, con la misma estructura.
+Cada presupuesto trae estado de resultados y balance mensual, un año fiscal 2027.
