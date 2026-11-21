@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Carga y validación</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400&display=swap">
+<style>
+body{margin:0;font-family:'Geist',system-ui,sans-serif}
+a{color:#111111}a:hover{color:#5f6368}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: #f9fafb; color: #111111; font-size: 14px; line-height: 1.45; font-variant-numeric: tabular-nums">
+<header style="display: flex; flex-wrap: wrap; align-items: center; gap: 0 32px; min-height: 48px; padding: 0 36px; background: #ffffff; border-bottom: 1px solid #e8e8e8">
+<div style="font-size: 16px; font-weight: 600">PulseGroup</div>
+<nav aria-label="Secciones" style="display: flex; gap: 24px; flex: 1 1 auto">
+<a href="Main.dc.html" aria-current="page" style="display: inline-flex; align-items: center; height: 48px; box-sizing: border-box; border-bottom: 2px solid #111111; color: #111111; text-decoration: none; font-weight: 600">Carga</a>
+<a href="Resumen.dc.html" style="display: inline-flex; align-items: center; height: 48px; box-sizing: border-box; border-bottom: 2px solid transparent; color: #5f6368; text-decoration: none; font-weight: 500">Resumen</a>
+<a href="Consolidado.dc.html" style="display: inline-flex; align-items: center; height: 48px; box-sizing: border-box; border-bottom: 2px solid transparent; color: #5f6368; text-decoration: none; font-weight: 500">Consolidado</a>
+</nav>
+<div style="color: #5f6368">Presupuesto del grupo · GTQ</div>
+</header>
+
+<main style="max-width: 1208px; margin: 0 auto; padding: 36px; box-sizing: border-box; display: flex; flex-direction: column; gap: 24px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px 24px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 style="margin: 0; font-size: 24px; font-weight: 600; line-height: 1.25">Carga de presupuestos</h1>
+<p style="margin: 0; color: #5f6368">6 archivos leídos. 5 filas quedan fuera del número del grupo hasta que alguien las corrija.</p>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<button type="button" style="height: 36px; padding: 0 14px; border: 1px solid #d1d5db; border-radius: 6px; background: #ffffff; color: #111111; font: inherit; font-weight: 500; cursor: pointer">Reemplazar archivos</button>
+<a href="Resumen.dc.html" style="display: inline-flex; align-items: center; height: 36px; padding: 0 16px; border-radius: 6px; background: #111111; color: #ffffff; text-decoration: none; font-weight: 500">Consolidar</a>
+</div>
+</div>
+
+<section aria-label="Archivos" style="display: flex; flex-direction: column; gap: 12px; padding: 20px; background: #ffffff; border: 1px solid #e8e8e8; border-radius: 8px">
+<h2 style="margin: 0; font-size: 16px; font-weight: 600">Archivos</h2>
+<div style="overflow-x: auto">
+<table style="width: 100%; min-width: 860px; border-collapse: collapse">
+<thead>
+<tr>
+<th scope="col" style="text-align: left; padding: 8px 12px; font-size: 12px; font-weight: 500; color: #5f6368; border-bottom: 1px solid #e8e8e8">Empresa</th>
+<th scope="col" style="text-align: left; padding: 8px 12px; font-size: 12px; font-weight: 500; color: #5f6368; border-bottom: 1px solid #e8e8e8">Archivo</th>
+<th scope="col" style="text-align: left; padding: 8px 12px; font-size: 12px; font-weight: 500; color: #5f6368; border-bottom: 1px solid #e8e8e8">Formato detectado</th>
+<th scope="col" style="text-align: left; padding: 8px 12px; font-size: 12px; font-weight: 500; color: #5f6368; border-bottom: 1px solid #e8e8e8">Moneda</th>
+<th scope="col" style="text-align: right; padding: 8px 12px; font-size: 12px; font-weight: 500; color: #5f6368; border-bottom: 1px solid #e8e8e8">Filas</th>
+<th scope="col" style="text-align: left; padding: 8px 12px; font-size: 12px; font-weight: 500; color: #5f6368; border-bottom: 1px solid #e8e8e8">Estado</th>
+<th scope="col" style="text-align: right; padding: 8px 12px; font-size: 12px; font-weight: 500; color: #5f6368; border-bottom: 1px solid #e8e8e8">Mapeo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th scope="row" style="text-align: left; padding: 6px 12px; border-bottom: 1px solid #f0f0f0; font-weight: 500">Empresa 1</th>
+<td style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px">e1_presupuesto.xlsx</td>
+<td style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0">Largo, una fila por mes</td>
+<td style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0">GTQ</td>
+<td style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0; text-align: right">214</td>
+<td style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0"><span style="display: inline-block; padding: 2px 8px; border-radius: 999px; background: #ffedea; color: #831c1e; font-size: 12px; font-weight: 500; white-space: nowrap">1 en cuarentena</span></td>
+<td style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0; text-align: right"><a href="Mapeo.dc.html" style="display: inline-flex; align-items: center; height: 32px; padding: 0 10px; border: 1px solid #d1d5db; border-radius: 6px; background: #ffffff; color: #111111; text-decoration: none; font-weight: 500; white-space: nowrap">Ver mapeo</a></td>
+</tr>
+<tr>
+<th scope="row" style="text-align: left; padding: 6px 12px; border-bottom: 1px solid #f0f0f0; font-weight: 500">Empresa 2</th>
+<td style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px">e2_presupuesto.xlsx</td>
+<td style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0">Largo, una fila por mes</td>
+<td style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0">GTQ</td>
+<td style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0; text-align: right">236</td>
+<td style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0"><span style="display: inline-block; padding: 2px 8px; border-radius: 999px; background: #ffedea; color: #831c1e; font-size: 12px; font-weight: 500; white-space: nowrap">2 en cuarentena</span></td>
+<td style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0; text-align: right"><a href="Mapeo.dc.html" style="display: inline-flex; align-items: center; height: 32px; padding: 0 10px; border: 1px solid #d1d5db; border-radius: 6px; background: #ffffff; color: #111111; text-decoration: none; font-weight: 500; white-space: nowrap">Ver mapeo</a></td>
+</tr>
+<tr>
+<th scope="row" style="text-align: left; padding: 6px 12px; border-bottom: 1px solid #f0f0f0; font-weight: 500">Empresa 3</th>
+<td style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px">e3_budget.csv</td>
+<td style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0">Ancho, un mes por columna</td>
+<td style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0">USD</td>
+<td style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0; text-align: right">198</td>
+<td style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0"><span style="display: inline-block; padding: 2px 8px; border-radius: 999px; background: #ffedea; color: #831c1e; font-size: 12px; font-weight: 500; white-space: nowrap">1 en cuarentena</span></td>
+<td style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0; text-align: right"><a href="Mapeo.dc.html" style="display: inline-flex; align-items: center; height: 32px; padding: 0 10px; border: 1px solid #d1d5db; border-radius: 6px; background: #ffffff; color: #111111; text-decoration: none; font-weight: 500; white-space: nowrap">Ver mapeo</a></td>
+</tr>
+<tr>
+<th scope="row" style="text-align: left; padding: 6px 12px; border-bottom: 1px solid #f0f0f0; font-weight: 500">Empresa 4</th>
+<td style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px">e4_budget.csv</td>
+<td style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0">Ancho, un mes por columna</td>
+<td style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0">USD</td>
+<td style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0; text-align: right">187</td>
+<td style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0"><span style="display: inline-block; padding: 2px 8px; border-radius: 999px; background: #ffedea; color: #831c1e; font-size: 12px; font-weight: 500; white-space: nowrap">1 en cuarentena</span></td>
+<td style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0; text-align: right"><a href="Mapeo.dc.html" style="display: inline-flex; align-items: center; height: 32px; padding: 0 10px; border: 1px solid #d1d5db; border-radius: 6px; background: #ffffff; color: #111111; text-decoration: none; font-weight: 500; white-space: nowrap">Ver mapeo</a></td>
+</tr>
+<tr>
+<th scope="row" style="text-align: left; padding: 6px 12px; border-bottom: 1px solid #f0f0f0; font-weight: 500">Empresa 5</th>
+<td style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px">e5_presupuesto.xlsx</td>
+<td style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0">Largo, montos en miles</td>
+<td style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0">MXN</td>
+<td style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0; text-align: right">172</td>
+<td style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0"><span style="display: inline-block; padding: 2px 8px; border-radius: 999px; background: #dcfae5; color: #04250e; font-size: 12px; font-weight: 500; white-space: nowrap">Bloqueo resuelto</span></td>
+<td style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0; text-align: right"><a href="Mapeo.dc.html" style="display: inline-flex; align-items: center; height: 32px; padding: 0 10px; border: 1px solid #d1d5db; border-radius: 6px; background: #ffffff; color: #111111; text-decoration: none; font-weight: 500; white-space: nowrap">Ver mapeo</a></td>
+</tr>
+<tr>
+<th scope="row" style="text-align: left; padding: 6px 12px; font-weight: 500">Empresa 6</th>
+<td style="padding: 6px 12px; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px">e6_presupuesto.xlsx</td>
+<td style="padding: 6px 12px">Una hoja por área</td>
+<td style="padding: 6px 12px">MXN</td>
+<td style="padding: 6px 12px; text-align: right">241</td>
+<td style="padding: 6px 12px"><span style="display: inline-block; padding: 2px 8px; border-radius: 999px; background: #f1f3f4; color: #111111; font-size: 12px; font-weight: 500; white-space: nowrap">1 aviso</span></td>
+<td style="padding: 6px 12px; text-align: right"><a href="Mapeo.dc.html" style="display: inline-flex; align-items: center; height: 32px; padding: 0 10px; border: 1px solid #d1d5db; border-radius: 6px; background: #ffffff; color: #111111; text-decoration: none; font-weight: 500; white-space: nowrap">Ver mapeo</a></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<section aria-label="Hallazgos" style="display: flex; flex-direction: column; gap: 12px; padding: 20px; background: #ffffff; border: 1px solid #e8e8e8; border-radius: 8px">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 24px">
+<h2 style="margin: 0; font-size: 16px; font-weight: 600">Hallazgos</h2>
+<div style="color: #5f6368">1,248 filas leídas · 1,242 limpias · 6 hallazgos</div>
+</div>
+<div style="overflow-x: auto">
+<table style="width: 100%; min-width: 940px; border-collapse: collapse">
+<thead>
+<tr>
+<th scope="col" style="text-align: left; padding: 8px 12px; font-size: 12px; font-weight: 500; color: #5f6368; border-bottom: 1px solid #e8e8e8">Regla</th>
+<th scope="col" style="text-align: left; padding: 8px 12px; font-size: 12px; font-weight: 500; color: #5f6368; border-bottom: 1px solid #e8e8e8">Estado</th>
+<th scope="col" style="text-align: left; padding: 8px 12px; font-size: 12px; font-weight: 500; color: #5f6368; border-bottom: 1px solid #e8e8e8">Dónde</th>
+<th scope="col" style="text-align: left; padding: 8px 12px; font-size: 12px; font-weight: 500; color: #5f6368; border-bottom: 1px solid #e8e8e8">Esperado y encontrado</th>
+<th scope="col" style="text-align: left; padding: 8px 12px; font-size: 12px; font-weight: 500; color: #5f6368; border-bottom: 1px solid #e8e8e8">Efecto en el grupo</th>
+<th scope="col" style="text-align: right; padding: 8px 12px; font-size: 12px; font-weight: 500; color: #5f6368; border-bottom: 1px solid #e8e8e8">Acción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th scope="row" style="text-align: left; padding: 8px 12px; border-bottom: 1px solid #f0f0f0; font-weight: 500">Tasa de cambio invertida</th>
+<td style="padding: 8px 12px; border-bottom: 1px solid #f0f0f0"><span style="display: inline-block; padding: 2px 8px; border-radius: 999px; background: #dcfae5; color: #04250e; font-size: 12px; font-weight: 500; white-space: nowrap">Bloqueo resuelto</span></td>
+<td style="padding: 8px 12px; border-bottom: 1px solid #f0f0f0; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px">Empresa 5 · hoja Tasas · fila 4</td>
+<td style="padding: 8px 12px; border-bottom: 1px solid #f0f0f0">0.42 GTQ por MXN, venía 2.38</td>
+<td style="padding: 8px 12px; border-bottom: 1px solid #f0f0f0">Inflaba ingresos en Q 12.3 M</td>
+<td style="padding: 8px 12px; border-bottom: 1px solid #f0f0f0; text-align: right; color: #5f6368">Tasa del grupo aplicada</td>
+</tr>
+<tr>
+<th scope="row" style="text-align: left; padding: 8px 12px; border-bottom: 1px solid #f0f0f0; font-weight: 500">Venta entre empresas no cuadra</th>
+<td style="padding: 8px 12px; border-bottom: 1px solid #f0f0f0"><span style="display: inline-block; padding: 2px 8px; border-radius: 999px; background: #ffedea; color: #831c1e; font-size: 12px; font-weight: 500; white-space: nowrap">Cuarentena</span></td>
+<td style="padding: 8px 12px; border-bottom: 1px solid #f0f0f0; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px">Empresa 1 · fila 212 y Empresa 4 · fila 88</td>
+<td style="padding: 8px 12px; border-bottom: 1px solid #f0f0f0">Venta de 100,000, compra de 85,000</td>
+<td style="padding: 8px 12px; border-bottom: 1px solid #f0f0f0">Q 15,000 sin conciliar</td>
+<td style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0; text-align: right"><button type="button" style="height: 32px; padding: 0 10px; border: 1px solid #d1d5db; border-radius: 6px; background: #ffffff; color: #111111; font: inherit; font-weight: 500; cursor: pointer; white-space: nowrap">Ver el par</button></td>
+</tr>
+<tr>
+<th scope="row" style="text-align: left; padding: 8px 12px; border-bottom: 1px solid #f0f0f0; font-weight: 500">Fila duplicada</th>
+<td style="padding: 8px 12px; border-bottom: 1px solid #f0f0f0"><span style="display: inline-block; padding: 2px 8px; border-radius: 999px; background: #ffedea; color: #831c1e; font-size: 12px; font-weight: 500; white-space: nowrap">Cuarentena</span></td>
+<td style="padding: 8px 12px; border-bottom: 1px solid #f0f0f0; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px">Empresa 2 · fila 144 repite la 143</td>
+<td style="padding: 8px 12px; border-bottom: 1px solid #f0f0f0">Una venta contada dos veces</td>
+<td style="padding: 8px 12px; border-bottom: 1px solid #f0f0f0">Inflaba ingresos en Q 0.4 M</td>
+<td style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0; text-align: right"><button type="button" style="height: 32px; padding: 0 10px; border: 1px solid #d1d5db; border-radius: 6px; background: #ffffff; color: #111111; font: inherit; font-weight: 500; cursor: pointer; white-space: nowrap">Ver filas</button></td>
+</tr>
+<tr>
+<th scope="row" style="text-align: left; padding: 8px 12px; border-bottom: 1px solid #f0f0f0; font-weight: 500">Signo invertido</th>
+<td style="padding: 8px 12px; border-bottom: 1px solid #f0f0f0"><span style="display: inline-block; padding: 2px 8px; border-radius: 999px; background: #ffedea; color: #831c1e; font-size: 12px; font-weight: 500; white-space: nowrap">Cuarentena</span></td>
+<td style="padding: 8px 12px; border-bottom: 1px solid #f0f0f0; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px">Empresa 3 · fila 57</td>
+<td style="padding: 8px 12px; border-bottom: 1px solid #f0f0f0">Gasto de 310,000 con signo positivo</td>
+<td style="padding: 8px 12px; border-bottom: 1px solid #f0f0f0">Inflaba el EBIT en Q 0.6 M</td>
+<td style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0; text-align: right"><button type="button" style="height: 32px; padding: 0 10px; border: 1px solid #d1d5db; border-radius: 6px; background: #ffffff; color: #111111; font: inherit; font-weight: 500; cursor: pointer; white-space: nowrap">Corregir signo</button></td>
+</tr>
+<tr>
+<th scope="row" style="text-align: left; padding: 8px 12px; border-bottom: 1px solid #f0f0f0; font-weight: 500">Cuenta sin mapeo</th>
+<td style="padding: 8px 12px; border-bottom: 1px solid #f0f0f0"><span style="display: inline-block; padding: 2px 8px; border-radius: 999px; background: #ffedea; color: #831c1e; font-size: 12px; font-weight: 500; white-space: nowrap">Cuarentena</span></td>
+<td style="padding: 8px 12px; border-bottom: 1px solid #f0f0f0; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px">Empresa 2 · fila 201</td>
+<td style="padding: 8px 12px; border-bottom: 1px solid #f0f0f0">La cuenta 6190 no está en el catálogo</td>
+<td style="padding: 8px 12px; border-bottom: 1px solid #f0f0f0">Q 12,500 fuera del consolidado</td>
+<td style="padding: 6px 12px; border-bottom: 1px solid #f0f0f0; text-align: right"><button type="button" style="height: 32px; padding: 0 10px; border: 1px solid #d1d5db; border-radius: 6px; background: #ffffff; color: #111111; font: inherit; font-weight: 500; cursor: pointer; white-space: nowrap">Mapear cuenta</button></td>
+</tr>
+<tr>
+<th scope="row" style="text-align: left; padding: 8px 12px; font-weight: 500">Indicador copiado no coincide</th>
+<td style="padding: 8px 12px"><span style="display: inline-block; padding: 2px 8px; border-radius: 999px; background: #f1f3f4; color: #111111; font-size: 12px; font-weight: 500; white-space: nowrap">Aviso</span></td>
+<td style="padding: 8px 12px; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px">Empresa 6 · hoja KPIs · fila 3</td>
+<td style="padding: 8px 12px">ROIC reportado 14.2 %, recalculado 9.6 %</td>
+<td style="padding: 8px 12px">Se usa el recalculado</td>
+<td style="padding: 6px 12px; text-align: right"><button type="button" style="height: 32px; padding: 0 10px; border: 1px solid #d1d5db; border-radius: 6px; background: #ffffff; color: #111111; font: inherit; font-weight: 500; cursor: pointer; white-space: nowrap">Ver cálculo</button></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1100}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

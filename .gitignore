@@ -1,2 +1,12 @@
+node_modules
+.next
+out
+*.tsbuildinfo
+next-env.d.ts
+.env*
+.DS_Store
+.taste-skill
+data/uploads/
+
 # Notas locales del contrato de WACC; quedan fuera del repositorio.
 docs/wacc-inputs-explanation.md

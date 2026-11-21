@@ -1,0 +1,7 @@
+.next
+node_modules
+vendor
+pnpm-lock.yaml
+docs/handoff
+.taste-skill
+data

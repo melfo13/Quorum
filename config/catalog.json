@@ -1,0 +1,175 @@
+{
+  "groupCurrency": "GTQ",
+  "accounts": [
+    {
+      "code": "4000",
+      "name": "Ventas",
+      "statement": "PL",
+      "kind": "revenue"
+    },
+    {
+      "code": "4100",
+      "name": "Ventas entre empresas",
+      "statement": "PL",
+      "kind": "revenue",
+      "ic": true
+    },
+    {
+      "code": "5000",
+      "name": "Costo de ventas",
+      "statement": "PL",
+      "kind": "cogs"
+    },
+    {
+      "code": "5100",
+      "name": "Compras entre empresas",
+      "statement": "PL",
+      "kind": "cogs",
+      "ic": true
+    },
+    {
+      "code": "6100",
+      "name": "Sueldos y prestaciones",
+      "statement": "PL",
+      "kind": "opex"
+    },
+    {
+      "code": "6200",
+      "name": "Logística y fletes",
+      "statement": "PL",
+      "kind": "opex"
+    },
+    {
+      "code": "6300",
+      "name": "Arrendamientos",
+      "statement": "PL",
+      "kind": "opex"
+    },
+    {
+      "code": "6400",
+      "name": "Mercadeo",
+      "statement": "PL",
+      "kind": "opex"
+    },
+    {
+      "code": "6500",
+      "name": "Servicios y otros gastos",
+      "statement": "PL",
+      "kind": "opex"
+    },
+    {
+      "code": "6900",
+      "name": "Depreciación",
+      "statement": "PL",
+      "kind": "opex"
+    },
+    {
+      "code": "7100",
+      "name": "Gastos financieros",
+      "statement": "PL",
+      "kind": "finance"
+    },
+    {
+      "code": "8100",
+      "name": "Impuesto sobre la renta",
+      "statement": "PL",
+      "kind": "tax"
+    },
+    {
+      "code": "1100",
+      "name": "Efectivo",
+      "statement": "BS",
+      "kind": "asset",
+      "current": true
+    },
+    {
+      "code": "1200",
+      "name": "Cuentas por cobrar",
+      "statement": "BS",
+      "kind": "asset",
+      "current": true
+    },
+    {
+      "code": "1250",
+      "name": "Cuentas por cobrar entre empresas",
+      "statement": "BS",
+      "kind": "asset",
+      "current": true,
+      "ic": true
+    },
+    {
+      "code": "1300",
+      "name": "Inventarios",
+      "statement": "BS",
+      "kind": "asset",
+      "current": true
+    },
+    {
+      "code": "1500",
+      "name": "Propiedad, planta y equipo",
+      "statement": "BS",
+      "kind": "asset"
+    },
+    {
+      "code": "2100",
+      "name": "Proveedores",
+      "statement": "BS",
+      "kind": "liability",
+      "current": true
+    },
+    {
+      "code": "2150",
+      "name": "Cuentas por pagar entre empresas",
+      "statement": "BS",
+      "kind": "liability",
+      "current": true,
+      "ic": true
+    },
+    {
+      "code": "2200",
+      "name": "Impuestos por pagar",
+      "statement": "BS",
+      "kind": "liability",
+      "current": true
+    },
+    {
+      "code": "2300",
+      "name": "Deuda de corto plazo",
+      "statement": "BS",
+      "kind": "liability",
+      "current": true,
+      "debt": true
+    },
+    {
+      "code": "2500",
+      "name": "Deuda de largo plazo",
+      "statement": "BS",
+      "kind": "liability",
+      "debt": true
+    },
+    {
+      "code": "3100",
+      "name": "Capital social",
+      "statement": "BS",
+      "kind": "equity"
+    },
+    {
+      "code": "3200",
+      "name": "Utilidades retenidas",
+      "statement": "BS",
+      "kind": "equity"
+    },
+    {
+      "code": "3300",
+      "name": "Resultado del ejercicio",
+      "statement": "BS",
+      "kind": "equity"
+    },
+    {
+      "code": "3900",
+      "name": "Diferencias de conversión y eliminación",
+      "statement": "BS",
+      "kind": "equity"
+    }
+  ]
+}

@@ -1,0 +1,138 @@
+@import 'tailwindcss';
+
+/*
+ * PulseGroup tokens. Style: achromatic ledger (taste skill, app screens).
+ * The chrome holds no colour. Colour is for status pills and for the one data hue (--accent),
+ * which marks the screen's main data element and the source cell a figure came from.
+ */
+:root {
+  --ground: #f9fafb;
+  --surface: #ffffff;
+  --raised: #f6f7f8;
+  --active: #eeeeee;
+  --border: #e8e8e8;
+  --rule: #f0f0f0;
+  --control: #d1d5db;
+  --text: #111111;
+  --muted: #5f6368;
+  --faint: #6b6b6b;
+  --primary: #111111;
+  --accent: #1d5fbf;
+  --accent-tint: #e8f0fb;
+  --positive: #247b50;
+  --negative: #c4242a;
+  --pill-positive-bg: #dcfae5;
+  --pill-positive-ink: #04250e;
+  --pill-negative-bg: #ffedea;
+  --pill-negative-ink: #831c1e;
+  --pill-neutral-bg: #f1f3f4;
+  --pill-neutral-ink: #111111;
+  --pill-warning-bg: #fffbeb;
+  --pill-warning-ink: #92400e;
+  --pill-warning-border: #fde68a;
+  --track: #e8e8e8;
+  --bar-muted: #9aa0a6;
+  --bar-step: #d1d5db;
+}
+
+@theme inline {
+  --color-ground: var(--ground);
+  --color-surface: var(--surface);
+  --color-raised: var(--raised);
+  --color-active: var(--active);
+  --color-border: var(--border);
+  --color-rule: var(--rule);
+  --color-control: var(--control);
+  --color-ink: var(--text);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-primary: var(--primary);
+  --color-accent: var(--accent);
+  --color-accent-tint: var(--accent-tint);
+  --color-positive: var(--positive);
+  --color-negative: var(--negative);
+  --color-pos-bg: var(--pill-positive-bg);
+  --color-pos-ink: var(--pill-positive-ink);
+  --color-neg-bg: var(--pill-negative-bg);
+  --color-neg-ink: var(--pill-negative-ink);
+  --color-neu-bg: var(--pill-neutral-bg);
+  --color-warn-bg: var(--pill-warning-bg);
+  --color-warn-ink: var(--pill-warning-ink);
+  --color-warn-border: var(--pill-warning-border);
+  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --radius-card: 8px;
+  --radius-control: 6px;
+}
+
+html {
+  background: var(--ground);
+  color: var(--text);
+}
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.45;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+
+@layer base {
+  a {
+    color: inherit;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+::selection {
+  background: var(--accent-tint);
+}
+
+/* Tables: rules and alignment. 12px grey sentence-case headers, no bands, no zebra. */
+.ledger {
+  width: 100%;
+  border-collapse: collapse;
+}
+.ledger th[scope='col'] {
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.ledger td,
+.ledger th[scope='row'] {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--rule);
+  text-align: left;
+  vertical-align: top;
+}
+.ledger tr:last-child > td,
+.ledger tr:last-child > th[scope='row'] {
+  border-bottom: 0;
+}
+.ledger .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
